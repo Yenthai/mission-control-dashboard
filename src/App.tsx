@@ -36,11 +36,17 @@ type MeetingItem = {
   important: boolean
 }
 
+type NoteItem = {
+  id: number
+  text: string
+}
+
 const storageKeys = {
   agenda: 'mission-control-agenda',
   todos: 'mission-control-todos',
   mails: 'mission-control-mails',
   meetings: 'mission-control-meetings',
+  notes: 'mission-control-notes',
 }
 
 const googleCalendarEmbedUrl =
@@ -72,6 +78,11 @@ const defaultMeetings: MeetingItem[] = [
   { id: 3, time: '14:00', name: 'Kundmöte', attendees: 'Yen + extern kontakt', important: true },
 ]
 
+const defaultNotes: NoteItem[] = [
+  { id: 1, text: 'Kom ihåg att följa upp högprio-leads före lunch.' },
+  { id: 2, text: 'Dubbelkolla mötespunkter inför Filip-avstämningen.' },
+]
+
 const readStorage = <T,>(key: string, fallback: T): T => {
   if (typeof window === 'undefined') return fallback
 
@@ -86,16 +97,13 @@ const readStorage = <T,>(key: string, fallback: T): T => {
 function App() {
   const [agenda, setAgenda] = useState<AgendaItem[]>(() => readStorage(storageKeys.agenda, defaultAgenda))
   const [todos, setTodos] = useState<TodoItem[]>(() => readStorage(storageKeys.todos, defaultTodos))
-  const [mails, setMails] = useState<MailItem[]>(() => readStorage(storageKeys.mails, defaultMails))
+  const [mails] = useState<MailItem[]>(() => readStorage(storageKeys.mails, defaultMails))
   const [meetings, setMeetings] = useState<MeetingItem[]>(() => readStorage(storageKeys.meetings, defaultMeetings))
+  const [notes, setNotes] = useState<NoteItem[]>(() => readStorage(storageKeys.notes, defaultNotes))
 
   const [todoInput, setTodoInput] = useState('')
   const [todoStatus, setTodoStatus] = useState<TodoStatus>('Nästa')
   const [todoImportant, setTodoImportant] = useState(false)
-
-  const [mailSender, setMailSender] = useState('')
-  const [mailSubject, setMailSubject] = useState('')
-  const [mailPriority, setMailPriority] = useState<MailPriority>('Medel')
 
   const [agendaTime, setAgendaTime] = useState('')
   const [agendaTitle, setAgendaTitle] = useState('')
@@ -107,10 +115,11 @@ function App() {
   const [meetingAttendees, setMeetingAttendees] = useState('')
   const [meetingImportant, setMeetingImportant] = useState(false)
 
+  const [noteInput, setNoteInput] = useState('')
+
   const [editingAgendaId, setEditingAgendaId] = useState<number | null>(null)
   const [editingMeetingId, setEditingMeetingId] = useState<number | null>(null)
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null)
-  const [editingMailId, setEditingMailId] = useState<number | null>(null)
 
   useEffect(() => {
     window.localStorage.setItem(storageKeys.agenda, JSON.stringify(agenda))
@@ -121,22 +130,21 @@ function App() {
   }, [todos])
 
   useEffect(() => {
-    window.localStorage.setItem(storageKeys.mails, JSON.stringify(mails))
-  }, [mails])
-
-  useEffect(() => {
     window.localStorage.setItem(storageKeys.meetings, JSON.stringify(meetings))
   }, [meetings])
 
+  useEffect(() => {
+    window.localStorage.setItem(storageKeys.notes, JSON.stringify(notes))
+  }, [notes])
+
   const sortedAgenda = useMemo(() => [...agenda].sort((a, b) => a.time.localeCompare(b.time)), [agenda])
   const sortedMeetings = useMemo(() => [...meetings].sort((a, b) => a.time.localeCompare(b.time)), [meetings])
-  const topThree = useMemo(() => todos.filter((todo) => todo.status !== 'Klar').slice(0, 3), [todos])
   const completedTodos = useMemo(() => todos.filter((todo) => todo.status === 'Klar').length, [todos])
   const activeTodos = useMemo(() => todos.filter((todo) => todo.status !== 'Klar').length, [todos])
   const highPriorityMails = useMemo(() => mails.filter((mail) => mail.priority === 'Hög').length, [mails])
   const importantMeetings = useMemo(() => meetings.filter((meeting) => meeting.important).length, [meetings])
   const progressPercent = todos.length > 0 ? Math.round((completedTodos / todos.length) * 100) : 0
-  const focusMessage = activeTodos <= 2 ? 'Lugn rytm idag' : progressPercent >= 50 ? 'Bra tempo idag' : 'Välj ett fokusblock och börja där'
+  const focusMessage = activeTodos <= 2 ? 'Lugn rytm idag' : progressPercent >= 50 ? 'Bra tempo idag' : 'Börja med första viktiga uppgiften'
 
   const timeline = useMemo(
     () => [
@@ -153,15 +161,6 @@ function App() {
     setTodoInput('')
     setTodoStatus('Nästa')
     setTodoImportant(false)
-  }
-
-  const handleAddMail = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!mailSender.trim() || !mailSubject.trim()) return
-    setMails((current) => [{ id: Date.now(), sender: mailSender.trim(), subject: mailSubject.trim(), priority: mailPriority }, ...current])
-    setMailSender('')
-    setMailSubject('')
-    setMailPriority('Medel')
   }
 
   const handleAddAgenda = (event: FormEvent<HTMLFormElement>) => {
@@ -184,6 +183,13 @@ function App() {
     setMeetingImportant(false)
   }
 
+  const handleAddNote = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!noteInput.trim()) return
+    setNotes((current) => [{ id: Date.now(), text: noteInput.trim() }, ...current])
+    setNoteInput('')
+  }
+
   const toggleTodoStatus = (id: number) => {
     setTodos((current) => current.map((todo) => {
       if (todo.id !== id) return todo
@@ -197,83 +203,107 @@ function App() {
   const toggleAgendaImportant = (id: number) => setAgenda((current) => current.map((item) => (item.id === id ? { ...item, important: !item.important } : item)))
   const toggleMeetingImportant = (id: number) => setMeetings((current) => current.map((item) => (item.id === id ? { ...item, important: !item.important } : item)))
 
-  const removeMail = (id: number) => setMails((current) => current.filter((mail) => mail.id !== id))
   const removeAgenda = (id: number) => setAgenda((current) => current.filter((item) => item.id !== id))
   const removeMeeting = (id: number) => setMeetings((current) => current.filter((meeting) => meeting.id !== id))
+  const removeNote = (id: number) => setNotes((current) => current.filter((note) => note.id !== id))
 
   const updateAgendaItem = (id: number, field: keyof Omit<AgendaItem, 'id'>, value: string | boolean) => setAgenda((current) => current.map((item) => (item.id === id ? { ...item, [field]: value } : item)).sort((a, b) => a.time.localeCompare(b.time)))
   const updateMeetingItem = (id: number, field: keyof Omit<MeetingItem, 'id'>, value: string | boolean) => setMeetings((current) => current.map((item) => (item.id === id ? { ...item, [field]: value } : item)).sort((a, b) => a.time.localeCompare(b.time)))
   const updateTodoItem = (id: number, value: string) => setTodos((current) => current.map((item) => (item.id === id ? { ...item, title: value } : item)))
-  const updateMailItem = (id: number, field: keyof Omit<MailItem, 'id'>, value: string) => setMails((current) => current.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
 
   return (
     <main className="dashboard-shell">
-      <section className="overview-panel card">
-        <div className="overview-copy">
+      <section className="topbar card">
+        <div className="topbar-copy">
           <p className="eyebrow">Mission control</p>
-          <h1>Din dashboard, omgjord från grunden</h1>
-          <p className="lede">Mindre brus, tydligare fokus och ett bättre flöde för dagen. Här ser du först vad som är viktigast — resten ligger där du behöver det.</p>
+          <h1>Lugn överblick, tydligt fokus</h1>
+          <p className="lede">Det viktigaste först. Din to do är huvudytan, planeringen ligger i mitten och kalendern finns nära som stöd.</p>
         </div>
 
-        <div className="stats-grid">
+        <div className="stats-grid compact-stats">
           <article className="stat-card accent-peach">
             <span>Uppgifter kvar</span>
             <strong>{activeTodos}</strong>
-            <p>{completedTodos} klara hittills</p>
+            <p>{completedTodos} klara</p>
           </article>
           <article className="stat-card accent-sand">
             <span>Viktiga mail</span>
             <strong>{highPriorityMails}</strong>
-            <p>Redo att besvaras</p>
+            <p>Snabba att scanna</p>
           </article>
           <article className="stat-card accent-lilac">
             <span>Viktiga möten</span>
             <strong>{importantMeetings}</strong>
-            <p>{meetings.length} möten idag</p>
+            <p>{meetings.length} totalt idag</p>
           </article>
         </div>
       </section>
 
-      <section className="main-layout">
-        <article className="card focus-panel">
+      <section className="structured-layout">
+        <article className="card todo-spotlight">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Fokus</p>
-              <h2>Dagens top 3</h2>
+              <p className="eyebrow">Huvudfokus</p>
+              <h2>To do</h2>
             </div>
             <span className="percentage-pill">{progressPercent}%</span>
           </div>
 
           <div className="focus-summary">
             <strong>{focusMessage}</strong>
-            <p>{completedTodos} av {todos.length} uppgifter är klara</p>
+            <p>{completedTodos} av {todos.length} uppgifter är klara idag</p>
           </div>
 
           <div className="progress-bar"><div className="progress-value" style={{ width: `${progressPercent}%` }} /></div>
 
-          <div className="focus-list">
-            {topThree.map((todo, index) => (
-              <div key={todo.id} className={`focus-item ${todo.important ? 'is-important' : ''}`}>
-                <div className="focus-number">{index + 1}</div>
+          <form className="compact-form" onSubmit={handleAddTodo}>
+            <input value={todoInput} onChange={(event) => setTodoInput(event.target.value)} placeholder="Ny uppgift" />
+            <select value={todoStatus} onChange={(event) => setTodoStatus(event.target.value as TodoStatus)}>
+              <option>Nästa</option>
+              <option>Pågår</option>
+              <option>Klar</option>
+            </select>
+            <label className="checkbox-row"><input type="checkbox" checked={todoImportant} onChange={(event) => setTodoImportant(event.target.checked)} /> Viktig</label>
+            <button type="submit">Lägg till</button>
+          </form>
+
+          <div className="todo-list large-list">
+            {todos.map((item) => (
+              <div key={item.id} className={`mini-card todo-card ${item.important ? 'important-row' : ''}`}>
+                <button className="check-toggle" type="button" aria-label="Byt status" onClick={() => toggleTodoStatus(item.id)} />
                 <div className="grow">
-                  <h3>{todo.title}</h3>
-                  <p>{todo.status}</p>
+                  {editingTodoId === item.id ? (
+                    <input className="edit-input" value={item.title} onChange={(event) => updateTodoItem(item.id, event.target.value)} />
+                  ) : (
+                    <>
+                      <div className="mini-top">
+                        <div>
+                          <h3>{item.title}</h3>
+                          <p>{item.important ? 'Huvudfokus' : 'Vanlig uppgift'}</p>
+                        </div>
+                        <span className={`badge status-${item.status.toLowerCase()}`}>{item.status}</span>
+                      </div>
+                      <div className="mini-actions">
+                        <button className="text-button" type="button" onClick={() => toggleTodoImportant(item.id)}>{item.important ? 'Avmarkera' : 'Viktig'}</button>
+                        <button className="text-button" type="button" onClick={() => setEditingTodoId(editingTodoId === item.id ? null : item.id)}>{editingTodoId === item.id ? 'Spara' : 'Redigera'}</button>
+                      </div>
+                    </>
+                  )}
                 </div>
-                {todo.important && <span className="badge badge-strong">Viktig</span>}
               </div>
             ))}
           </div>
         </article>
 
-        <article className="card timeline-panel">
+        <article className="card center-structure">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Plan</p>
-              <h2>Dagens flöde</h2>
+              <p className="eyebrow">Struktur</p>
+              <h2>Agenda + möten</h2>
             </div>
           </div>
 
-          <div className="timeline-list">
+          <div className="timeline-list structured-timeline">
             {timeline.map((item) => (
               <div key={`${item.kind}-${item.id}`} className="timeline-row">
                 <div className="timeline-time">{item.time}</div>
@@ -293,221 +323,155 @@ function App() {
               </div>
             ))}
           </div>
-        </article>
 
-        <aside className="side-stack">
-          <article className="card manager-card">
-            <div className="section-head">
-              <div>
-                <p className="eyebrow">Att göra</p>
-                <h2>Uppgifter</h2>
+          <div className="split-mini-grid">
+            <article className="inner-card">
+              <div className="split-header">
+                <div>
+                  <p className="eyebrow">Agenda</p>
+                  <h3>Lägg till</h3>
+                </div>
               </div>
-            </div>
 
-            <form className="compact-form" onSubmit={handleAddTodo}>
-              <input value={todoInput} onChange={(event) => setTodoInput(event.target.value)} placeholder="Ny uppgift" />
-              <select value={todoStatus} onChange={(event) => setTodoStatus(event.target.value as TodoStatus)}>
-                <option>Nästa</option>
-                <option>Pågår</option>
-                <option>Klar</option>
-              </select>
-              <label className="checkbox-row"><input type="checkbox" checked={todoImportant} onChange={(event) => setTodoImportant(event.target.checked)} /> Viktig</label>
-              <button type="submit">Lägg till</button>
-            </form>
+              <form className="compact-form" onSubmit={handleAddAgenda}>
+                <input value={agendaTime} onChange={(event) => setAgendaTime(event.target.value)} placeholder="Tid" />
+                <input value={agendaTitle} onChange={(event) => setAgendaTitle(event.target.value)} placeholder="Vad ska göras?" />
+                <input value={agendaDetail} onChange={(event) => setAgendaDetail(event.target.value)} placeholder="Kort beskrivning" />
+                <label className="checkbox-row"><input type="checkbox" checked={agendaImportant} onChange={(event) => setAgendaImportant(event.target.checked)} /> Viktig</label>
+                <button type="submit">Lägg till</button>
+              </form>
 
-            <div className="mini-list">
-              {todos.map((item) => (
-                <div key={item.id} className="mini-card">
-                  <button className="check-toggle" type="button" aria-label="Byt status" onClick={() => toggleTodoStatus(item.id)} />
-                  <div className="grow">
-                    {editingTodoId === item.id ? (
-                      <input className="edit-input" value={item.title} onChange={(event) => updateTodoItem(item.id, event.target.value)} />
+              <div className="mini-list short-list">
+                {sortedAgenda.map((item) => (
+                  <div key={item.id} className="mini-card no-check">
+                    {editingAgendaId === item.id ? (
+                      <div className="edit-stack grow">
+                        <input className="edit-input" value={item.time} onChange={(event) => updateAgendaItem(item.id, 'time', event.target.value)} />
+                        <input className="edit-input" value={item.title} onChange={(event) => updateAgendaItem(item.id, 'title', event.target.value)} />
+                        <input className="edit-input" value={item.detail} onChange={(event) => updateAgendaItem(item.id, 'detail', event.target.value)} />
+                        <div className="mini-actions">
+                          <button className="text-button" type="button" onClick={() => setEditingAgendaId(null)}>Spara</button>
+                          <button className="text-button danger" type="button" onClick={() => removeAgenda(item.id)}>Ta bort</button>
+                        </div>
+                      </div>
                     ) : (
                       <>
-                        <div className="mini-top">
-                          <h3>{item.title}</h3>
-                          <span className={`badge status-${item.status.toLowerCase()}`}>{item.status}</span>
-                        </div>
-                        <div className="mini-actions">
-                          <button className="text-button" type="button" onClick={() => toggleTodoImportant(item.id)}>{item.important ? 'Avmarkera' : 'Viktig'}</button>
-                          <button className="text-button" type="button" onClick={() => setEditingTodoId(editingTodoId === item.id ? null : item.id)}>{editingTodoId === item.id ? 'Spara' : 'Redigera'}</button>
+                        <div className="time-chip">{item.time}</div>
+                        <div className="grow">
+                          <div className="mini-top">
+                            <div>
+                              <h3>{item.title}</h3>
+                              <p>{item.detail}</p>
+                            </div>
+                            {item.important && <span className="badge badge-strong">Viktig</span>}
+                          </div>
+                          <div className="mini-actions">
+                            <button className="text-button" type="button" onClick={() => toggleAgendaImportant(item.id)}>{item.important ? 'Avmarkera' : 'Viktig'}</button>
+                            <button className="text-button" type="button" onClick={() => setEditingAgendaId(item.id)}>Redigera</button>
+                          </div>
                         </div>
                       </>
                     )}
                   </div>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className="card manager-card">
-            <div className="section-head">
-              <div>
-                <p className="eyebrow">Inkorg</p>
-                <h2>Mail</h2>
+                ))}
               </div>
-            </div>
+            </article>
 
-            <form className="compact-form" onSubmit={handleAddMail}>
-              <input value={mailSender} onChange={(event) => setMailSender(event.target.value)} placeholder="Från" />
-              <input value={mailSubject} onChange={(event) => setMailSubject(event.target.value)} placeholder="Ämne" />
-              <select value={mailPriority} onChange={(event) => setMailPriority(event.target.value as MailPriority)}>
-                <option>Hög</option>
-                <option>Medel</option>
-                <option>Låg</option>
-              </select>
-              <button type="submit">Lägg till</button>
-            </form>
+            <article className="inner-card">
+              <div className="split-header">
+                <div>
+                  <p className="eyebrow">Möten</p>
+                  <h3>Lägg till</h3>
+                </div>
+              </div>
 
-            <div className="mini-list">
-              {mails.map((mail) => (
-                <div key={mail.id} className="mini-card no-check">
-                  <div className="grow">
-                    {editingMailId === mail.id ? (
-                      <div className="edit-stack">
-                        <input className="edit-input" value={mail.subject} onChange={(event) => updateMailItem(mail.id, 'subject', event.target.value)} />
-                        <input className="edit-input" value={mail.sender} onChange={(event) => updateMailItem(mail.id, 'sender', event.target.value)} />
+              <form className="compact-form" onSubmit={handleAddMeeting}>
+                <input value={meetingTime} onChange={(event) => setMeetingTime(event.target.value)} placeholder="Tid" />
+                <input value={meetingName} onChange={(event) => setMeetingName(event.target.value)} placeholder="Mötesnamn" />
+                <input value={meetingAttendees} onChange={(event) => setMeetingAttendees(event.target.value)} placeholder="Deltagare" />
+                <label className="checkbox-row"><input type="checkbox" checked={meetingImportant} onChange={(event) => setMeetingImportant(event.target.checked)} /> Viktig</label>
+                <button type="submit">Lägg till</button>
+              </form>
+
+              <div className="mini-list short-list">
+                {sortedMeetings.map((meeting) => (
+                  <div key={meeting.id} className="mini-card no-check">
+                    {editingMeetingId === meeting.id ? (
+                      <div className="edit-stack grow">
+                        <input className="edit-input" value={meeting.time} onChange={(event) => updateMeetingItem(meeting.id, 'time', event.target.value)} />
+                        <input className="edit-input" value={meeting.name} onChange={(event) => updateMeetingItem(meeting.id, 'name', event.target.value)} />
+                        <input className="edit-input" value={meeting.attendees} onChange={(event) => updateMeetingItem(meeting.id, 'attendees', event.target.value)} />
+                        <div className="mini-actions">
+                          <button className="text-button" type="button" onClick={() => setEditingMeetingId(null)}>Spara</button>
+                          <button className="text-button danger" type="button" onClick={() => removeMeeting(meeting.id)}>Ta bort</button>
+                        </div>
                       </div>
                     ) : (
                       <>
-                        <div className="mini-top">
-                          <div>
-                            <h3>{mail.subject}</h3>
-                            <p>{mail.sender}</p>
+                        <div className="time-chip">{meeting.time}</div>
+                        <div className="grow">
+                          <div className="mini-top">
+                            <div>
+                              <h3>{meeting.name}</h3>
+                              <p>{meeting.attendees}</p>
+                            </div>
+                            {meeting.important && <span className="badge badge-strong">Viktig</span>}
                           </div>
-                          <span className={`badge priority-${mail.priority.toLowerCase()}`}>{mail.priority}</span>
-                        </div>
-                        <div className="mini-actions">
-                          <button className="text-button" type="button" onClick={() => setEditingMailId(editingMailId === mail.id ? null : mail.id)}>{editingMailId === mail.id ? 'Spara' : 'Redigera'}</button>
-                          <button className="text-button danger" type="button" onClick={() => removeMail(mail.id)}>Ta bort</button>
+                          <div className="mini-actions">
+                            <button className="text-button" type="button" onClick={() => toggleMeetingImportant(meeting.id)}>{meeting.important ? 'Avmarkera' : 'Viktig'}</button>
+                            <button className="text-button" type="button" onClick={() => setEditingMeetingId(meeting.id)}>Redigera</button>
+                          </div>
                         </div>
                       </>
                     )}
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+        </article>
+
+        <aside className="right-support">
+          <article className="card calendar-panel support-card">
+            <div className="section-head">
+              <div>
+                <p className="eyebrow">Stöd</p>
+                <h2>Kalender</h2>
+              </div>
+            </div>
+
+            <div className="calendar-wrap">
+              <iframe src={googleCalendarEmbedUrl} title="Google Kalender" className="calendar-embed" frameBorder="0" scrolling="no" />
+            </div>
+          </article>
+
+          <article className="card notes-panel support-card">
+            <div className="section-head">
+              <div>
+                <p className="eyebrow">Quick notes</p>
+                <h2>Snabba anteckningar</h2>
+              </div>
+            </div>
+
+            <form className="compact-form" onSubmit={handleAddNote}>
+              <input value={noteInput} onChange={(event) => setNoteInput(event.target.value)} placeholder="Skriv en snabb notis" />
+              <button type="submit">Spara notis</button>
+            </form>
+
+            <div className="mini-list short-list">
+              {notes.map((note) => (
+                <div key={note.id} className="mini-card no-check note-card">
+                  <div className="grow">
+                    <p>{note.text}</p>
+                    <div className="mini-actions">
+                      <button className="text-button danger" type="button" onClick={() => removeNote(note.id)}>Ta bort</button>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </article>
         </aside>
-      </section>
-
-      <section className="bottom-layout">
-        <article className="card split-card">
-          <div className="split-header">
-            <div>
-              <p className="eyebrow">Agenda</p>
-              <h2>Lägg till och justera</h2>
-            </div>
-          </div>
-
-          <form className="compact-form" onSubmit={handleAddAgenda}>
-            <input value={agendaTime} onChange={(event) => setAgendaTime(event.target.value)} placeholder="Tid" />
-            <input value={agendaTitle} onChange={(event) => setAgendaTitle(event.target.value)} placeholder="Vad ska göras?" />
-            <input value={agendaDetail} onChange={(event) => setAgendaDetail(event.target.value)} placeholder="Kort beskrivning" />
-            <label className="checkbox-row"><input type="checkbox" checked={agendaImportant} onChange={(event) => setAgendaImportant(event.target.checked)} /> Viktig</label>
-            <button type="submit">Lägg till</button>
-          </form>
-
-          <div className="mini-list">
-            {sortedAgenda.map((item) => (
-              <div key={item.id} className="mini-card no-check">
-                {editingAgendaId === item.id ? (
-                  <div className="edit-stack grow">
-                    <input className="edit-input" value={item.time} onChange={(event) => updateAgendaItem(item.id, 'time', event.target.value)} />
-                    <input className="edit-input" value={item.title} onChange={(event) => updateAgendaItem(item.id, 'title', event.target.value)} />
-                    <input className="edit-input" value={item.detail} onChange={(event) => updateAgendaItem(item.id, 'detail', event.target.value)} />
-                    <div className="mini-actions">
-                      <button className="text-button" type="button" onClick={() => setEditingAgendaId(null)}>Spara</button>
-                      <button className="text-button danger" type="button" onClick={() => removeAgenda(item.id)}>Ta bort</button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="time-chip">{item.time}</div>
-                    <div className="grow">
-                      <div className="mini-top">
-                        <div>
-                          <h3>{item.title}</h3>
-                          <p>{item.detail}</p>
-                        </div>
-                        {item.important && <span className="badge badge-strong">Viktig</span>}
-                      </div>
-                      <div className="mini-actions">
-                        <button className="text-button" type="button" onClick={() => toggleAgendaImportant(item.id)}>{item.important ? 'Avmarkera' : 'Viktig'}</button>
-                        <button className="text-button" type="button" onClick={() => setEditingAgendaId(item.id)}>Redigera</button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="card split-card">
-          <div className="split-header">
-            <div>
-              <p className="eyebrow">Möten</p>
-              <h2>Snabb överblick</h2>
-            </div>
-          </div>
-
-          <form className="compact-form" onSubmit={handleAddMeeting}>
-            <input value={meetingTime} onChange={(event) => setMeetingTime(event.target.value)} placeholder="Tid" />
-            <input value={meetingName} onChange={(event) => setMeetingName(event.target.value)} placeholder="Mötesnamn" />
-            <input value={meetingAttendees} onChange={(event) => setMeetingAttendees(event.target.value)} placeholder="Deltagare" />
-            <label className="checkbox-row"><input type="checkbox" checked={meetingImportant} onChange={(event) => setMeetingImportant(event.target.checked)} /> Viktig</label>
-            <button type="submit">Lägg till</button>
-          </form>
-
-          <div className="mini-list">
-            {sortedMeetings.map((meeting) => (
-              <div key={meeting.id} className="mini-card no-check">
-                {editingMeetingId === meeting.id ? (
-                  <div className="edit-stack grow">
-                    <input className="edit-input" value={meeting.time} onChange={(event) => updateMeetingItem(meeting.id, 'time', event.target.value)} />
-                    <input className="edit-input" value={meeting.name} onChange={(event) => updateMeetingItem(meeting.id, 'name', event.target.value)} />
-                    <input className="edit-input" value={meeting.attendees} onChange={(event) => updateMeetingItem(meeting.id, 'attendees', event.target.value)} />
-                    <div className="mini-actions">
-                      <button className="text-button" type="button" onClick={() => setEditingMeetingId(null)}>Spara</button>
-                      <button className="text-button danger" type="button" onClick={() => removeMeeting(meeting.id)}>Ta bort</button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="time-chip">{meeting.time}</div>
-                    <div className="grow">
-                      <div className="mini-top">
-                        <div>
-                          <h3>{meeting.name}</h3>
-                          <p>{meeting.attendees}</p>
-                        </div>
-                        {meeting.important && <span className="badge badge-strong">Viktig</span>}
-                      </div>
-                      <div className="mini-actions">
-                        <button className="text-button" type="button" onClick={() => toggleMeetingImportant(meeting.id)}>{meeting.important ? 'Avmarkera' : 'Viktig'}</button>
-                        <button className="text-button" type="button" onClick={() => setEditingMeetingId(meeting.id)}>Redigera</button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="card calendar-panel">
-          <div className="section-head">
-            <div>
-              <p className="eyebrow">Kalender</p>
-              <h2>Google Kalender</h2>
-            </div>
-          </div>
-
-          <div className="calendar-wrap">
-            <iframe src={googleCalendarEmbedUrl} title="Google Kalender" className="calendar-embed" frameBorder="0" scrolling="no" />
-          </div>
-        </article>
       </section>
     </main>
   )
