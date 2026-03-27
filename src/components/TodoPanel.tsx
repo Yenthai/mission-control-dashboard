@@ -69,7 +69,14 @@ export default function TodoPanel({
         </div>
         <div className="todo-header-actions">
           <span className="percentage-pill">{progressPercent}%</span>
-          <button type="button" className="icon-button" aria-label="Lägg till uppgift" onClick={() => setShowComposer(true)}>+</button>
+          <button
+            type="button"
+            className={`icon-button ${showComposer ? 'is-open' : ''}`}
+            aria-label={showComposer ? 'Stäng uppgiftspanel' : 'Öppna uppgiftspanel'}
+            onClick={() => setShowComposer((current) => !current)}
+          >
+            {showComposer ? '−' : '+'}
+          </button>
         </div>
       </div>
 
@@ -115,7 +122,12 @@ export default function TodoPanel({
             <button className="check-toggle" type="button" aria-label="Byt status" onClick={() => toggleTodoStatus(item.id)} />
             <div className="grow">
               {editingTodoId === item.id ? (
-                <input className="edit-input" value={item.title} onChange={(event) => updateTodoItem(item.id, event.target.value)} />
+                <div className="edit-stack grow">
+                  <input className="edit-input" value={item.title} onChange={(event) => updateTodoItem(item.id, event.target.value)} />
+                  <div className="mini-actions">
+                    <button className="text-button" type="button" onClick={() => setEditingTodoId(null)}>Spara</button>
+                  </div>
+                </div>
               ) : (
                 <>
                   <div className="mini-top">
@@ -127,7 +139,7 @@ export default function TodoPanel({
                   </div>
                   <div className="mini-actions">
                     <button className="text-button" type="button" onClick={() => toggleTodoImportant(item.id)}>{item.important ? 'Avmarkera' : 'Viktig'}</button>
-                    <button className="text-button" type="button" onClick={() => setEditingTodoId(editingTodoId === item.id ? null : item.id)}>{editingTodoId === item.id ? 'Spara' : 'Redigera'}</button>
+                    <button className="text-button" type="button" onClick={() => setEditingTodoId(item.id)}>Redigera</button>
                   </div>
                 </>
               )}

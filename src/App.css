@@ -241,6 +241,10 @@ h3 {
   box-shadow: 0 12px 22px rgba(91, 58, 49, 0.18);
 }
 
+.icon-button.is-open {
+  background: linear-gradient(135deg, #7a5c53 0%, #c48b99 100%);
+}
+
 .slide-panel {
   margin-bottom: 18px;
   padding: 18px;

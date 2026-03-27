@@ -57,7 +57,14 @@ export default function AgendaPanel({
           <p className="eyebrow">Agenda</p>
           <h3>Dagens agenda</h3>
         </div>
-        <button type="button" className="icon-button" aria-label="Lägg till agenda" onClick={() => setShowComposer(true)}>+</button>
+        <button
+          type="button"
+          className={`icon-button ${showComposer ? 'is-open' : ''}`}
+          aria-label={showComposer ? 'Stäng agendapanel' : 'Öppna agendapanel'}
+          onClick={() => setShowComposer((current) => !current)}
+        >
+          {showComposer ? '−' : '+'}
+        </button>
       </div>
 
       {showComposer && (
