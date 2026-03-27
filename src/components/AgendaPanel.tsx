@@ -63,7 +63,7 @@ export default function AgendaPanel({
           aria-label={showComposer ? 'Stäng agendapanel' : 'Öppna agendapanel'}
           onClick={() => setShowComposer((current) => !current)}
         >
-          {showComposer ? '−' : '+'}
+          {showComposer ? '-' : '+'}
         </button>
       </div>
 

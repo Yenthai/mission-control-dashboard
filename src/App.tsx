@@ -190,8 +190,7 @@ function App() {
       <section className="topbar card">
         <div className="topbar-copy">
           <p className="eyebrow">Mission control</p>
-          <h1>Lugn överblick, tydligt fokus</h1>
-          <p className="lede">Det viktigaste först. Din to do är huvudytan, planeringen ligger i mitten och kalendern finns nära som stöd.</p>
+          <h1>Välkommen tillbaka Yen</h1>
         </div>
 
         <div className="stats-grid compact-stats">

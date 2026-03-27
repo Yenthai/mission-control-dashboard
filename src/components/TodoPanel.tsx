@@ -75,7 +75,7 @@ export default function TodoPanel({
             aria-label={showComposer ? 'Stäng uppgiftspanel' : 'Öppna uppgiftspanel'}
             onClick={() => setShowComposer((current) => !current)}
           >
-            {showComposer ? '−' : '+'}
+            {showComposer ? '-' : '+'}
           </button>
         </div>
       </div>
