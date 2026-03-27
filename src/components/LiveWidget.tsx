@@ -6,18 +6,17 @@ type WeatherState = {
   icon: string
 }
 
-type OpenMeteoResponse = {
-  current?: {
-    temperature_2m?: number
-    weather_code?: number
-  }
-}
-
 type SavedLocation = {
   key: string
   label: string
   latitude: number
   longitude: number
+}
+
+type WeatherApiResponse = {
+  temperature?: number
+  label?: string
+  icon?: string
 }
 
 const locationOptions: SavedLocation[] = [
@@ -26,39 +25,10 @@ const locationOptions: SavedLocation[] = [
   { key: 'orebro', label: 'Örebro', latitude: 59.2753, longitude: 15.2134 },
 ]
 
-const weatherCodeMap: Record<number, { label: string; icon: string }> = {
-  0: { label: 'Klart', icon: '☀️' },
-  1: { label: 'Mest klart', icon: '🌤️' },
-  2: { label: 'Delvis molnigt', icon: '⛅' },
-  3: { label: 'Molnigt', icon: '☁️' },
-  45: { label: 'Dimma', icon: '🌫️' },
-  48: { label: 'Dimma', icon: '🌫️' },
-  51: { label: 'Lätt duggregn', icon: '🌦️' },
-  53: { label: 'Duggregn', icon: '🌦️' },
-  55: { label: 'Tätt duggregn', icon: '🌧️' },
-  61: { label: 'Lätt regn', icon: '🌦️' },
-  63: { label: 'Regn', icon: '🌧️' },
-  65: { label: 'Kraftigt regn', icon: '🌧️' },
-  71: { label: 'Lätt snö', icon: '🌨️' },
-  73: { label: 'Snö', icon: '❄️' },
-  75: { label: 'Kraftig snö', icon: '❄️' },
-  80: { label: 'Regnskurar', icon: '🌦️' },
-  81: { label: 'Regnskurar', icon: '🌧️' },
-  82: { label: 'Kraftiga skurar', icon: '⛈️' },
-  95: { label: 'Åska', icon: '⛈️' },
-  96: { label: 'Åska med hagel', icon: '⛈️' },
-  99: { label: 'Åska med hagel', icon: '⛈️' },
-}
-
 const fallbackWeather: WeatherState = {
   temperature: 0,
   label: 'Väder laddas',
   icon: '☁️',
-}
-
-function mapWeatherCode(code?: number): { label: string; icon: string } {
-  if (code === undefined) return { label: 'Okänt väder', icon: '☁️' }
-  return weatherCodeMap[code] || { label: 'Okänt väder', icon: '☁️' }
 }
 
 function getInitialLocation(): SavedLocation {
@@ -94,20 +64,17 @@ export default function LiveWidget() {
 
     const fetchWeather = async () => {
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${selectedLocation.latitude}&longitude=${selectedLocation.longitude}&current=temperature_2m,weather_code&timezone=auto`
-        const response = await fetch(url)
+        const response = await fetch(`/api/weather?latitude=${selectedLocation.latitude}&longitude=${selectedLocation.longitude}`)
         if (!response.ok) throw new Error('Kunde inte hämta väder')
 
-        const data: OpenMeteoResponse = await response.json()
-        const current = data.current
-        const mapped = mapWeatherCode(current?.weather_code)
+        const data: WeatherApiResponse = await response.json()
 
         if (!active) return
 
         setWeather({
-          temperature: Math.round(current?.temperature_2m ?? 0),
-          label: mapped.label,
-          icon: mapped.icon,
+          temperature: data.temperature ?? 0,
+          label: data.label ?? 'Okänt väder',
+          icon: data.icon ?? '☁️',
         })
       } catch {
         if (!active) return
