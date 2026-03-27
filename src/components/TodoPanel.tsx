@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-type TodoStatus = 'Klar' | 'Pågår' | 'Nästa'
+type TodoStatus = 'PRIO' | 'Pågår' | 'Klar'
 type TodoFilter = 'Alla' | 'Aktiva' | 'Klara'
 
 type TodoItem = {
@@ -19,14 +19,11 @@ type TodoPanelProps = {
   setTodoInput: (value: string) => void
   todoStatus: TodoStatus
   setTodoStatus: (value: TodoStatus) => void
-  todoImportant: boolean
-  setTodoImportant: (value: boolean) => void
   todoFilter: TodoFilter
   setTodoFilter: (value: TodoFilter) => void
   visibleTodos: TodoItem[]
   handleAddTodo: (event: React.FormEvent<HTMLFormElement>) => void
   toggleTodoStatus: (id: number) => void
-  toggleTodoImportant: (id: number) => void
   editingTodoId: number | null
   setEditingTodoId: (id: number | null) => void
   updateTodoItem: (id: number, value: string) => void
@@ -41,14 +38,11 @@ export default function TodoPanel({
   setTodoInput,
   todoStatus,
   setTodoStatus,
-  todoImportant,
-  setTodoImportant,
   todoFilter,
   setTodoFilter,
   visibleTodos,
   handleAddTodo,
   toggleTodoStatus,
-  toggleTodoImportant,
   editingTodoId,
   setEditingTodoId,
   updateTodoItem,
@@ -106,11 +100,9 @@ export default function TodoPanel({
           <form className="compact-form" onSubmit={handleSubmit}>
             <input value={todoInput} onChange={(event) => setTodoInput(event.target.value)} placeholder="Ny uppgift" />
             <select value={todoStatus} onChange={(event) => setTodoStatus(event.target.value as TodoStatus)}>
-              <option>Nästa</option>
+              <option>PRIO</option>
               <option>Pågår</option>
-              <option>Klar</option>
             </select>
-            <label className="checkbox-row"><input type="checkbox" checked={todoImportant} onChange={(event) => setTodoImportant(event.target.checked)} /> Viktig</label>
             <button type="submit">Lägg till</button>
           </form>
         </div>
@@ -133,12 +125,11 @@ export default function TodoPanel({
                   <div className="mini-top">
                     <div>
                       <h3 className={item.status === 'Klar' ? 'completed-text' : ''}>{item.title}</h3>
-                      <p className={item.status === 'Klar' ? 'completed-text' : ''}>{item.important ? 'Huvudfokus' : 'Vanlig uppgift'}</p>
+                      <p className={item.status === 'Klar' ? 'completed-text' : ''}>{item.status === 'PRIO' ? 'Hög prioritet' : 'Pågående uppgift'}</p>
                     </div>
                     <span className={`badge status-${item.status.toLowerCase()}`}>{item.status}</span>
                   </div>
                   <div className="mini-actions">
-                    <button className="text-button" type="button" onClick={() => toggleTodoImportant(item.id)}>{item.important ? 'Avmarkera' : 'Viktig'}</button>
                     <button className="text-button" type="button" onClick={() => setEditingTodoId(item.id)}>Redigera</button>
                   </div>
                 </>

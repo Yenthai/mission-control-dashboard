@@ -14,7 +14,7 @@ type AgendaItem = {
   important: boolean
 }
 
-type TodoStatus = 'Klar' | 'Pågår' | 'Nästa'
+type TodoStatus = 'PRIO' | 'Pågår' | 'Klar'
 type TodoFilter = 'Alla' | 'Aktiva' | 'Klara'
 
 type TodoItem = {
@@ -57,8 +57,8 @@ const defaultAgenda: AgendaItem[] = [
 
 const defaultTodos: TodoItem[] = [
   { id: 1, title: 'Skicka uppföljning till nya leads', status: 'Pågår', important: true },
-  { id: 2, title: 'Förbered morgondagens mötespunkter', status: 'Nästa', important: true },
-  { id: 3, title: 'Rensa inkorg och markera viktiga svar', status: 'Nästa', important: false },
+  { id: 2, title: 'Förbered morgondagens mötespunkter', status: 'PRIO', important: true },
+  { id: 3, title: 'Rensa inkorg och markera viktiga svar', status: 'PRIO', important: false },
   { id: 4, title: 'Kontrollera veckans deadlines', status: 'Klar', important: false },
 ]
 
@@ -91,7 +91,7 @@ function App() {
   const [notes, setNotes] = useState<NoteItem[]>(() => readStorage(storageKeys.notes, defaultNotes))
 
   const [todoInput, setTodoInput] = useState('')
-  const [todoStatus, setTodoStatus] = useState<TodoStatus>('Nästa')
+  const [todoStatus, setTodoStatus] = useState<TodoStatus>('PRIO')
   const [todoImportant, setTodoImportant] = useState(false)
   const [todoFilter, setTodoFilter] = useState<TodoFilter>('Alla')
 
@@ -135,19 +135,12 @@ function App() {
   const progressPercent = todos.length > 0 ? Math.round((completedTodos / todos.length) * 100) : 0
   const focusMessage = activeTodos <= 2 ? 'Lugn rytm idag' : progressPercent >= 50 ? 'Bra tempo idag' : 'Börja med första viktiga uppgiften'
 
-  const timeline = useMemo(
-    () => [
-      ...sortedAgenda.map((item) => ({ ...item, kind: 'agenda' as const })),
-    ].sort((a, b) => a.time.localeCompare(b.time)),
-    [sortedAgenda],
-  )
-
   const handleAddTodo = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!todoInput.trim()) return
     setTodos((current) => [{ id: Date.now(), title: todoInput.trim(), status: todoStatus, important: todoImportant }, ...current])
     setTodoInput('')
-    setTodoStatus('Nästa')
+    setTodoStatus('PRIO')
     setTodoImportant(false)
   }
 
@@ -171,13 +164,12 @@ function App() {
   const toggleTodoStatus = (id: number) => {
     setTodos((current) => current.map((todo) => {
       if (todo.id !== id) return todo
-      if (todo.status === 'Nästa') return { ...todo, status: 'Pågår' }
+      if (todo.status === 'PRIO') return { ...todo, status: 'Pågår' }
       if (todo.status === 'Pågår') return { ...todo, status: 'Klar' }
-      return { ...todo, status: 'Nästa' }
+      return { ...todo, status: 'PRIO' }
     }))
   }
 
-  const toggleTodoImportant = (id: number) => setTodos((current) => current.map((todo) => (todo.id === id ? { ...todo, important: !todo.important } : todo)))
   const toggleAgendaImportant = (id: number) => setAgenda((current) => current.map((item) => (item.id === id ? { ...item, important: !item.important } : item)))
   const removeAgenda = (id: number) => setAgenda((current) => current.filter((item) => item.id !== id))
   const removeNote = (id: number) => setNotes((current) => current.filter((note) => note.id !== id))
@@ -222,14 +214,11 @@ function App() {
           setTodoInput={setTodoInput}
           todoStatus={todoStatus}
           setTodoStatus={setTodoStatus}
-          todoImportant={todoImportant}
-          setTodoImportant={setTodoImportant}
           todoFilter={todoFilter}
           setTodoFilter={setTodoFilter}
           visibleTodos={visibleTodos}
           handleAddTodo={handleAddTodo}
           toggleTodoStatus={toggleTodoStatus}
-          toggleTodoImportant={toggleTodoImportant}
           editingTodoId={editingTodoId}
           setEditingTodoId={setEditingTodoId}
           updateTodoItem={updateTodoItem}
@@ -239,29 +228,8 @@ function App() {
           <div className="section-head">
             <div>
               <p className="eyebrow">Struktur</p>
-              <h2>Agenda + möten</h2>
+              <h2>Översikt</h2>
             </div>
-          </div>
-
-          <div className="timeline-list structured-timeline">
-            {timeline.map((item) => (
-              <div key={`${item.kind}-${item.id}`} className="timeline-row">
-                <div className="timeline-time">{item.time}</div>
-                <div className="timeline-dot" />
-                <div className="timeline-card">
-                  <div className="timeline-top">
-                    <div>
-                      <h3>{item.title}</h3>
-                      <p>{item.detail}</p>
-                    </div>
-                    <div className="timeline-badges">
-                      <span className="badge">Agenda</span>
-                      {item.important && <span className="badge badge-strong">Viktig</span>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
 
           <div className="split-mini-grid">
