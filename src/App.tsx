@@ -5,6 +5,7 @@ import NotesPanel from './components/NotesPanel'
 import MeetingsPanel from './components/MeetingsPanel'
 import TodoPanel from './components/TodoPanel'
 import AgendaPanel from './components/AgendaPanel'
+import LiveWidget from './components/LiveWidget'
 
 type AgendaItem = {
   id: number
@@ -87,7 +88,7 @@ const readStorage = <T,>(key: string, fallback: T): T => {
 function App() {
   const [agenda, setAgenda] = useState<AgendaItem[]>(() => readStorage(storageKeys.agenda, defaultAgenda))
   const [todos, setTodos] = useState<TodoItem[]>(() => readStorage(storageKeys.todos, defaultTodos))
-  const [mails] = useState<MailItem[]>(() => readStorage(storageKeys.mails, defaultMails))
+  useState<MailItem[]>(() => readStorage(storageKeys.mails, defaultMails))
   const [notes, setNotes] = useState<NoteItem[]>(() => readStorage(storageKeys.notes, defaultNotes))
 
   const [todoInput, setTodoInput] = useState('')
@@ -131,7 +132,6 @@ function App() {
   }, [sortedTodos, todoFilter])
   const completedTodos = useMemo(() => todos.filter((todo) => todo.status === 'Klar').length, [todos])
   const activeTodos = useMemo(() => todos.filter((todo) => todo.status !== 'Klar').length, [todos])
-  const highPriorityMails = useMemo(() => mails.filter((mail) => mail.priority === 'Hög').length, [mails])
   const progressPercent = todos.length > 0 ? Math.round((completedTodos / todos.length) * 100) : 0
   const focusMessage = activeTodos <= 2 ? 'Lugn rytm idag' : progressPercent >= 50 ? 'Bra tempo idag' : 'Börja med första viktiga uppgiften'
 
@@ -185,23 +185,7 @@ function App() {
           <h1>Välkommen tillbaka Yen</h1>
         </div>
 
-        <div className="stats-grid compact-stats">
-          <article className="stat-card accent-peach">
-            <span>Uppgifter kvar</span>
-            <strong>{activeTodos}</strong>
-            <p>{completedTodos} klara</p>
-          </article>
-          <article className="stat-card accent-sand">
-            <span>Viktiga mail</span>
-            <strong>{highPriorityMails}</strong>
-            <p>Snabba att scanna</p>
-          </article>
-          <article className="stat-card accent-lilac">
-            <span>Möten</span>
-            <strong>Live</strong>
-            <p>Hämtas från backend</p>
-          </article>
-        </div>
+        <LiveWidget />
       </section>
 
       <section className="structured-layout">
