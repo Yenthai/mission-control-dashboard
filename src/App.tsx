@@ -12,7 +12,6 @@ type AgendaItem = {
   time: string
   title: string
   detail: string
-  important: boolean
 }
 
 type TodoStatus = 'PRIO' | 'Pågår' | 'Klar'
@@ -50,10 +49,10 @@ const googleCalendarEmbedUrl =
   'https://calendar.google.com/calendar/embed?src=yen.thairakic%40gmail.com&ctz=UTC'
 
 const defaultAgenda: AgendaItem[] = [
-  { id: 1, time: '09:00', title: 'Planera dagen', detail: 'Gå igenom mål, dagens viktigaste uppgifter och tidblock.', important: true },
-  { id: 2, time: '10:30', title: 'Kunduppföljning', detail: 'Svar på leads och prioritera nästa steg.', important: true },
-  { id: 3, time: '13:00', title: 'Admin + mail', detail: 'Rensa inkorg och svara på viktiga trådar.', important: false },
-  { id: 4, time: '15:00', title: 'Projektfokus', detail: 'Arbeta ostört med pågående dashboard och struktur.', important: false },
+  { id: 1, time: '09:00', title: 'Planera dagen', detail: 'Gå igenom mål, dagens viktigaste uppgifter och tidblock.' },
+  { id: 2, time: '10:30', title: 'Kunduppföljning', detail: 'Svar på leads och prioritera nästa steg.' },
+  { id: 3, time: '13:00', title: 'Admin + mail', detail: 'Rensa inkorg och svara på viktiga trådar.' },
+  { id: 4, time: '15:00', title: 'Projektfokus', detail: 'Arbeta ostört med pågående dashboard och struktur.' },
 ]
 
 const defaultTodos: TodoItem[] = [
@@ -93,13 +92,11 @@ function App() {
 
   const [todoInput, setTodoInput] = useState('')
   const [todoStatus, setTodoStatus] = useState<TodoStatus>('PRIO')
-  const [todoImportant, setTodoImportant] = useState(false)
   const [todoFilter, setTodoFilter] = useState<TodoFilter>('Alla')
 
   const [agendaTime, setAgendaTime] = useState('')
   const [agendaTitle, setAgendaTitle] = useState('')
   const [agendaDetail, setAgendaDetail] = useState('')
-  const [agendaImportant, setAgendaImportant] = useState(false)
 
   const [noteInput, setNoteInput] = useState('')
 
@@ -138,20 +135,18 @@ function App() {
   const handleAddTodo = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!todoInput.trim()) return
-    setTodos((current) => [{ id: Date.now(), title: todoInput.trim(), status: todoStatus, important: todoImportant }, ...current])
+    setTodos((current) => [{ id: Date.now(), title: todoInput.trim(), status: todoStatus, important: false }, ...current])
     setTodoInput('')
     setTodoStatus('PRIO')
-    setTodoImportant(false)
   }
 
   const handleAddAgenda = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!agendaTime.trim() || !agendaTitle.trim()) return
-    setAgenda((current) => [{ id: Date.now(), time: agendaTime.trim(), title: agendaTitle.trim(), detail: agendaDetail.trim() || 'Ingen extra beskrivning än.', important: agendaImportant }, ...current].sort((a, b) => a.time.localeCompare(b.time)))
+    setAgenda((current) => [{ id: Date.now(), time: agendaTime.trim(), title: agendaTitle.trim(), detail: agendaDetail.trim() || 'Ingen extra beskrivning än.' }, ...current].sort((a, b) => a.time.localeCompare(b.time)))
     setAgendaTime('')
     setAgendaTitle('')
     setAgendaDetail('')
-    setAgendaImportant(false)
   }
 
   const handleAddNote = (event: FormEvent<HTMLFormElement>) => {
@@ -170,7 +165,6 @@ function App() {
     }))
   }
 
-  const toggleAgendaImportant = (id: number) => setAgenda((current) => current.map((item) => (item.id === id ? { ...item, important: !item.important } : item)))
   const removeAgenda = (id: number) => setAgenda((current) => current.filter((item) => item.id !== id))
   const removeNote = (id: number) => setNotes((current) => current.filter((note) => note.id !== id))
 
@@ -224,15 +218,12 @@ function App() {
               setAgendaTitle={setAgendaTitle}
               agendaDetail={agendaDetail}
               setAgendaDetail={setAgendaDetail}
-              agendaImportant={agendaImportant}
-              setAgendaImportant={setAgendaImportant}
               handleAddAgenda={handleAddAgenda}
               sortedAgenda={sortedAgenda}
               editingAgendaId={editingAgendaId}
               setEditingAgendaId={setEditingAgendaId}
               updateAgendaItem={updateAgendaItem}
               removeAgenda={removeAgenda}
-              toggleAgendaImportant={toggleAgendaImportant}
             />
 
             <MeetingsPanel />

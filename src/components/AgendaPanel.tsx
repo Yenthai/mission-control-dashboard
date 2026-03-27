@@ -5,7 +5,6 @@ type AgendaItem = {
   time: string
   title: string
   detail: string
-  important: boolean
 }
 
 type AgendaPanelProps = {
@@ -15,15 +14,12 @@ type AgendaPanelProps = {
   setAgendaTitle: (value: string) => void
   agendaDetail: string
   setAgendaDetail: (value: string) => void
-  agendaImportant: boolean
-  setAgendaImportant: (value: boolean) => void
   handleAddAgenda: (event: React.FormEvent<HTMLFormElement>) => void
   sortedAgenda: AgendaItem[]
   editingAgendaId: number | null
   setEditingAgendaId: (id: number | null) => void
   updateAgendaItem: (id: number, field: keyof Omit<AgendaItem, 'id'>, value: string | boolean) => void
   removeAgenda: (id: number) => void
-  toggleAgendaImportant: (id: number) => void
 }
 
 export default function AgendaPanel({
@@ -33,15 +29,12 @@ export default function AgendaPanel({
   setAgendaTitle,
   agendaDetail,
   setAgendaDetail,
-  agendaImportant,
-  setAgendaImportant,
   handleAddAgenda,
   sortedAgenda,
   editingAgendaId,
   setEditingAgendaId,
   updateAgendaItem,
   removeAgenda,
-  toggleAgendaImportant,
 }: AgendaPanelProps) {
   const [showComposer, setShowComposer] = useState(false)
 
@@ -81,7 +74,6 @@ export default function AgendaPanel({
             <input value={agendaTime} onChange={(event) => setAgendaTime(event.target.value)} placeholder="Tid" />
             <input value={agendaTitle} onChange={(event) => setAgendaTitle(event.target.value)} placeholder="Vad ska göras?" />
             <input value={agendaDetail} onChange={(event) => setAgendaDetail(event.target.value)} placeholder="Kort beskrivning" />
-            <label className="checkbox-row"><input type="checkbox" checked={agendaImportant} onChange={(event) => setAgendaImportant(event.target.checked)} /> Viktig</label>
             <button type="submit">Lägg till</button>
           </form>
         </div>
@@ -109,10 +101,8 @@ export default function AgendaPanel({
                       <h3>{item.title}</h3>
                       <p>{item.detail}</p>
                     </div>
-                    {item.important && <span className="badge badge-strong">Viktig</span>}
                   </div>
                   <div className="mini-actions">
-                    <button className="text-button" type="button" onClick={() => toggleAgendaImportant(item.id)}>{item.important ? 'Avmarkera' : 'Viktig'}</button>
                     <button className="text-button" type="button" onClick={() => setEditingAgendaId(item.id)}>Redigera</button>
                   </div>
                 </div>

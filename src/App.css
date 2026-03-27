@@ -126,6 +126,27 @@ h3 {
   text-transform: capitalize;
 }
 
+.live-weather-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.live-location-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #6d5852;
+  font-size: 0.9rem;
+}
+
+.live-location-picker select {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
 .live-weather {
   display: flex;
   align-items: center;
