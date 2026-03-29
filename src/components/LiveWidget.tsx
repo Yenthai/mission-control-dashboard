@@ -110,12 +110,14 @@ export default function LiveWidget() {
   const airQuality = weather.temperature <= 0 ? 'Frisk' : weather.temperature <= 10 ? 'Lugn' : 'Mjuk'
 
   return (
-    <div
-      className={`weather-cardm ${isExpanded ? 'is-expanded' : ''}`}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-    >
-      <article className="weather-card-front">
+    <div className={`weather-cardm ${isExpanded ? 'is-expanded' : ''}`}>
+      <button
+        type="button"
+        className="weather-card-front weather-card-trigger"
+        onClick={() => setIsExpanded((current) => !current)}
+        aria-expanded={isExpanded}
+        aria-label={isExpanded ? 'Dölj mer väderinfo' : 'Visa mer väderinfo'}
+      >
         <div className="weather-card-top">
           <div>
             <p className="eyebrow">Väder just nu</p>
@@ -142,9 +144,9 @@ export default function LiveWidget() {
             <span>{comfortLabel}</span>
           </div>
         </div>
-      </article>
+      </button>
 
-      <article className="weather-card-back">
+      <article className="weather-card-back" aria-hidden={!isExpanded}>
         <div className="weather-metric-row upper">
           <div>
             <span>Luftfuktighet</span>

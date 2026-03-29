@@ -414,6 +414,12 @@ h3 {
   transform: translateY(-2px);
 }
 
+.weather-card-trigger {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
 .weather-card-front,
 .weather-card-back {
   width: 100%;
@@ -443,11 +449,16 @@ h3 {
   background: linear-gradient(180deg, #fffdfc 0%, #f7ece4 100%);
   border: 1px solid rgba(98, 64, 53, 0.08);
   box-shadow: 0 16px 32px rgba(82, 51, 43, 0.08);
-  opacity: 0.92;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
 }
 
 .weather-cardm.is-expanded .weather-card-back {
   inset: 18px 8px -130px 8px;
+  opacity: 0.92;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .weather-card-top {
