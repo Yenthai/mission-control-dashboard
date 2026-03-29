@@ -33,10 +33,13 @@ app.get('/api/mail', async (req, res) => {
   try {
     const { action, id } = req.query
 
+    // Använd aktuell arbetsmapp istället för hårdkodad sökväg
+    const workspacePath = process.env.WORKSPACE_PATH || process.cwd()
+
     // Hämta lista över olästa mail
     if (action === 'unread') {
       const { stdout, stderr } = await execPromise(
-        `cd /home/yenth/.openclaw/workspace && ./node_modules/.bin/gws gmail users messages list --params '{"userId": "me", "q": "is:unread", "maxResults": 10}'`
+        `cd ${workspacePath} && ./node_modules/.bin/gws gmail users messages list --params '{"userId": "me", "q": "is:unread", "maxResults": 10}'`
       )
 
       if (stderr) {
@@ -51,7 +54,7 @@ app.get('/api/mail', async (req, res) => {
         messages.map(async (msg) => {
           try {
             const { stdout: detailOut } = await execPromise(
-              `cd /home/yenth/.openclaw/workspace && ./node_modules/.bin/gws gmail users messages get --params '{"userId": "me", "id": "${msg.id}", "format": "metadata"}'`
+              `cd ${workspacePath} && ./node_modules/.bin/gws gmail users messages get --params '{"userId": "me", "id": "${msg.id}", "format": "metadata"}'`
             )
 
             const detail = JSON.parse(detailOut)
@@ -104,7 +107,7 @@ app.get('/api/mail', async (req, res) => {
     // Hämta enskilt mail
     if (action === 'get' && id) {
       const { stdout, stderr } = await execPromise(
-        `cd /home/yenth/.openclaw/workspace && ./node_modules/.bin/gws gmail users messages get --params '{"userId": "me", "id": "${id}", "format": "full"}'`
+        `cd ${workspacePath} && ./node_modules/.bin/gws gmail users messages get --params '{"userId": "me", "id": "${id}", "format": "full"}'`
       )
 
       if (stderr) {
