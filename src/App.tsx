@@ -94,7 +94,7 @@ const viewMeta: Record<ViewKey, { title: string; eyebrow: string; description: s
   overview: {
     title: 'Översikt',
     eyebrow: 'Mission control',
-    description: 'Din samlade kontrollpanel med dagens läge, fokus och snabb överblick.',
+    description: 'En varm premiumvy för dagens viktigaste fokus, nästa steg och en lugn kontroll över allt som pågår.',
   },
   notes: {
     title: 'Notes',
@@ -114,7 +114,7 @@ const viewMeta: Record<ViewKey, { title: string; eyebrow: string; description: s
   focus: {
     title: 'Fokus idag',
     eyebrow: 'Prioritet',
-    description: 'Det viktigaste just nu, samlat i en lugnare vy.',
+    description: 'Det viktigaste just nu, samlat i en lugnare och mer belönande vy.',
   },
   settings: {
     title: 'Inställningar',
@@ -246,25 +246,52 @@ function App() {
 
   const renderOverview = () => (
     <>
-      <section className="hero-card card">
+      <section className="hero-card hero-lux card">
         <div className="hero-copy">
-          <p className="eyebrow">God kväll, Yen</p>
-          <h1>Din dashboard har nu ett tydligare hjärta.</h1>
-          <p className="lede">
-            Här ser du dagens viktigaste fokus, vad som väntar härnäst och vad som behöver din uppmärksamhet först.
+          <div className="hero-badge-row">
+            <span className="hero-badge">God kväll, Yen</span>
+            <span className="hero-badge soft">{focusMessage}</span>
+          </div>
+
+          <h1>En varm och tydlig kontrollpanel för allt som behöver din uppmärksamhet.</h1>
+          <p className="lede hero-lede">
+            Få en lugn överblick över dagens läge, nästa steg och vad som faktiskt är viktigast — utan att sidan känns tung eller rörig.
           </p>
+
+          <div className="hero-actions-row">
+            <button type="button" className="header-pill" onClick={() => handleSelectView('todo')}>Öppna fokus</button>
+            <button type="button" className="header-pill soft" onClick={() => handleSelectView('notes')}>Skriv note</button>
+          </div>
+
+          <div className="hero-mini-summary">
+            <div className="hero-summary-card">
+              <span>Viktigast nu</span>
+              <strong>{importantTodos > 0 ? `${importantTodos} prioriterade tasks` : 'Lugn start'}</strong>
+            </div>
+            <div className="hero-summary-card soft">
+              <span>Nästa punkt</span>
+              <strong>{nextAgenda ? `${nextAgenda.time} · ${nextAgenda.title}` : 'Ingen punkt planerad ännu'}</strong>
+            </div>
+          </div>
         </div>
 
         <div className="hero-side">
-          <LiveWidget />
+          <div className="hero-side-stack">
+            <LiveWidget />
+            <article className="hero-focus-card">
+              <p className="eyebrow">Fokus idag</p>
+              <h2>{progressPercent}% på väg framåt</h2>
+              <p>{completedTodos} av {todos.length} tasks klara. {latestNote}</p>
+            </article>
+          </div>
         </div>
       </section>
 
-      <section className="overview-stats-grid">
-        <article className="stat-card accent-peach soft-card">
+      <section className="overview-stats-grid premium-stats-grid">
+        <article className="stat-card accent-peach soft-card stat-card-featured">
           <span>Öppna tasks</span>
           <strong>{activeTodos}</strong>
-          <p>{importantTodos} markerade som viktiga</p>
+          <p>{importantTodos} markerade som viktiga just nu</p>
         </article>
 
         <article className="stat-card accent-sand soft-card">
@@ -286,7 +313,7 @@ function App() {
         </article>
       </section>
 
-      <section className="overview-grid">
+      <section className="overview-grid premium-overview-grid">
         <div className="overview-main-column">
           <TodoPanel
             progressPercent={progressPercent}
@@ -317,6 +344,12 @@ function App() {
         </div>
 
         <aside className="overview-side-column">
+          <article className="card shell-panel spotlight-card">
+            <p className="eyebrow">Belöning</p>
+            <h2>Fortsätt i samma rytm</h2>
+            <p className="lede">När du börjar i rätt ordning blir resten enklare. Börja med den viktigaste uppgiften och låt dashboarden hålla ihop resten.</p>
+          </article>
+
           <AgendaPanel
             agendaTime={agendaTime}
             setAgendaTime={setAgendaTime}
@@ -334,7 +367,7 @@ function App() {
 
           <MeetingsPanel />
 
-          <article className="card support-card calendar-panel shell-panel">
+          <article className="card support-card calendar-panel shell-panel toned-calendar-panel">
             <div className="section-head">
               <div>
                 <p className="eyebrow">Stöd</p>
@@ -366,7 +399,7 @@ function App() {
   const renderMeetingsView = () => (
     <section className="dual-column-layout">
       <MeetingsPanel />
-      <article className="card support-card calendar-panel shell-panel">
+      <article className="card support-card calendar-panel shell-panel toned-calendar-panel">
         <div className="section-head">
           <div>
             <p className="eyebrow">Stöd</p>
@@ -495,10 +528,10 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell premium-shell">
       <div className={`mobile-backdrop ${mobileSidebarOpen ? 'is-visible' : ''}`} onClick={() => setMobileSidebarOpen(false)} />
 
-      <aside className={`sidebar-shell ${mobileSidebarOpen ? 'is-open' : ''}`}>
+      <aside className={`sidebar-shell premium-sidebar ${mobileSidebarOpen ? 'is-open' : ''}`}>
         <div className="sidebar-brand">
           <div className="brand-mark">Y</div>
           <div>
@@ -506,6 +539,12 @@ function App() {
             <h2>Yens dashboard</h2>
           </div>
         </div>
+
+        <article className="sidebar-intro-panel">
+          <span className="sidebar-intro-label">Premium workflow</span>
+          <strong>Lugn struktur med varm känsla</strong>
+          <p>Fokus först, resten efteråt.</p>
+        </article>
 
         <nav className="sidebar-nav">
           {navItems.map((item) => (
@@ -524,15 +563,15 @@ function App() {
           ))}
         </nav>
 
-        <div className="sidebar-footer card">
+        <div className="sidebar-footer card premium-sidebar-footer">
           <p className="eyebrow">Status</p>
-          <h3>Lugn, tydlig och på väg framåt</h3>
+          <h3>Du har kontroll på läget</h3>
           <p>{activeTodos} aktiva tasks · {notes.length} notes · {sortedAgenda.length} agenda-punkter</p>
         </div>
       </aside>
 
       <section className="main-shell">
-        <header className="page-header card">
+        <header className="page-header card premium-page-header">
           <div className="page-header-copy">
             <button type="button" className="mobile-menu-button" onClick={() => setMobileSidebarOpen(true)}>
               Meny
