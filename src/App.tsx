@@ -98,39 +98,6 @@ const defaultNotes: NoteItem[] = [
   { id: 2, text: 'Dubbelkolla mötespunkter inför Filip-avstämningen.' },
 ]
 
-const viewMeta: Record<ViewKey, { title: string; eyebrow: string; description: string }> = {
-  overview: {
-    title: 'Översikt',
-    eyebrow: 'Mission control',
-    description: 'En varm premiumvy för dagens viktigaste fokus, nästa steg och en lugn kontroll över allt som pågår.',
-  },
-  notes: {
-    title: 'Notes',
-    eyebrow: 'Skrivyta',
-    description: 'Samla snabba tankar, uppföljningar och sådant du inte vill tappa bort.',
-  },
-  meetings: {
-    title: 'Meetings',
-    eyebrow: 'Kalender',
-    description: 'Se dagens möten och håll koll på vad som kommer härnäst.',
-  },
-  todo: {
-    title: 'Todo',
-    eyebrow: 'Huvudfokus',
-    description: 'Prioritera rätt och flytta arbetet framåt utan att tappa överblicken.',
-  },
-  focus: {
-    title: 'Fokus idag',
-    eyebrow: 'Prioritet',
-    description: 'Det viktigaste just nu, samlat i en lugnare och mer belönande vy.',
-  },
-  settings: {
-    title: 'Inställningar',
-    eyebrow: 'System',
-    description: 'Plats för kommande val, preferenser och justeringar i dashboarden.',
-  },
-}
-
 const readStorage = <T,>(key: string, fallback: T): T => {
   if (typeof window === 'undefined') return fallback
 
@@ -211,7 +178,6 @@ function App() {
   const focusMessage = activeTodos <= 2 ? 'Lugn rytm idag' : progressPercent >= 50 ? 'Bra tempo idag' : 'Börja med första viktiga uppgiften'
   const latestNote = notes[0]?.text ?? 'Ingen notis ännu — skriv första tanken här.'
   const nextAgenda = sortedAgenda[0]
-  const pageMeta = viewMeta[activeView]
 
   const handleAddTodo = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -599,23 +565,7 @@ function App() {
         </div>
       </aside>
 
-      <section className="main-shell">
-        <header className="page-header card premium-page-header">
-          <div className="page-header-copy">
-            <button type="button" className="mobile-menu-button" onClick={() => setMobileSidebarOpen(true)}>
-              Meny
-            </button>
-            <p className="eyebrow">{pageMeta.eyebrow}</p>
-            <h1>{pageMeta.title}</h1>
-            <p className="lede">{pageMeta.description}</p>
-          </div>
-
-          <div className="page-header-actions">
-            <button type="button" className="header-pill" onClick={() => handleSelectView('notes')}>Ny note</button>
-            <button type="button" className="header-pill soft" onClick={() => handleSelectView('todo')}>Till todo</button>
-          </div>
-        </header>
-
+      <section className="main-shell main-shell-lifted">
         <div className="view-shell">{renderActiveView()}</div>
       </section>
 
