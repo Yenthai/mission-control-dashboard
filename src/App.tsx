@@ -300,32 +300,8 @@ function App() {
   const renderOverview = () => (
     <>
       <section className="hero-card hero-lux card">
-        <div className="hero-copy">
-          <div className="hero-badge-row">
-            <span className="hero-badge">God kväll, Yen</span>
-            <span className="hero-badge soft">{focusMessage}</span>
-          </div>
-
-          <h1>En varm och tydlig kontrollpanel för allt som behöver din uppmärksamhet.</h1>
-          <p className="lede hero-lede">
-            Få en lugn överblick över dagens läge, nästa steg och vad som faktiskt är viktigast — utan att sidan känns tung eller rörig.
-          </p>
-
-          <div className="hero-actions-row">
-            <button type="button" className="header-pill" onClick={() => handleSelectView('todo')}>Öppna fokus</button>
-            <button type="button" className="header-pill soft" onClick={() => handleSelectView('notes')}>Skriv note</button>
-          </div>
-
-          <div className="hero-mini-summary">
-            <div className="hero-summary-card">
-              <span>Viktigast nu</span>
-              <strong>{importantTodos > 0 ? `${importantTodos} prioriterade tasks` : 'Lugn start'}</strong>
-            </div>
-            <div className="hero-summary-card soft">
-              <span>Nästa punkt</span>
-              <strong>{nextAgenda ? `${nextAgenda.time} · ${nextAgenda.title}` : 'Ingen punkt planerad ännu'}</strong>
-            </div>
-          </div>
+        <div className="hero-copy hero-copy-simple">
+          <h1>Välkommen tillbaka Yen</h1>
         </div>
 
         <div className="hero-side">
