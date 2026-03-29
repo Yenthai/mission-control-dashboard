@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 
 type MailItem = {
   id: string
@@ -11,16 +11,21 @@ type MailItem = {
   isUnread: boolean
 }
 
+type MailFilter = 'alla' | 'olästa' | 'lästa'
+
 type MailPanelProps = {
   onOpenMail?: (mail: MailItem) => void
   compact?: boolean
+  showFilters?: boolean
 }
 
-export default function MailPanel({ onOpenMail, compact = false }: MailPanelProps) {
+export default function MailPanel({ onOpenMail, compact = false, showFilters = false }: MailPanelProps) {
   const [mails, setMails] = useState<MailItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [lastFetched, setLastFetched] = useState<Date | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filter, setFilter] = useState<MailFilter>('olästa')
 
   const fetchMails = async () => {
     try {
@@ -72,20 +77,45 @@ export default function MailPanel({ onOpenMail, compact = false }: MailPanelProp
     return match ? match[1].trim() : from.split('@')[0]
   }
 
+  // Filtrera och sök i mail
+  const filteredMails = useMemo(() => {
+    let result = mails
+
+    // Apply filter (olästa/lästa/all)
+    if (filter === 'olästa') {
+      result = result.filter(m => m.isUnread)
+    } else if (filter === 'lästa') {
+      result = result.filter(m => !m.isUnread)
+    }
+    // 'alla' visar allt
+
+    // Apply search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      result = result.filter(m =>
+        m.subject.toLowerCase().includes(query) ||
+        m.from.toLowerCase().includes(query) ||
+        m.snippet.toLowerCase().includes(query)
+      )
+    }
+
+    return result
+  }, [mails, filter, searchQuery])
+
   if (loading && mails.length === 0) {
     return (
       <article className={`card shell-panel ${compact ? 'compact-mail-panel' : ''}`}>
         <div className="section-head">
           <div>
             <p className="eyebrow">Inkorg</p>
-            <h2>Olästa mail</h2>
+            <h2>Mail</h2>
           </div>
           <button type="button" className="refresh-btn" onClick={handleRefresh} disabled>
             Laddar...
           </button>
         </div>
         <div className="mail-loading">
-          <p>Hämtar dina olästa mail...</p>
+          <p>Hämtar dina mail...</p>
         </div>
       </article>
     )
@@ -97,7 +127,7 @@ export default function MailPanel({ onOpenMail, compact = false }: MailPanelProp
         <div className="section-head">
           <div>
             <p className="eyebrow">Inkorg</p>
-            <h2>Olästa mail</h2>
+            <h2>Mail</h2>
           </div>
           <button type="button" className="refresh-btn" onClick={handleRefresh}>
             Försök igen
@@ -115,7 +145,7 @@ export default function MailPanel({ onOpenMail, compact = false }: MailPanelProp
       <div className="section-head">
         <div>
           <p className="eyebrow">Inkorg</p>
-          <h2>Olästa mail {mails.length > 0 && `(${mails.length})`}</h2>
+          <h2>Mail {mails.length > 0 && `(${mails.length})`}</h2>
         </div>
         <div className="mail-actions">
           {lastFetched && (
@@ -129,13 +159,65 @@ export default function MailPanel({ onOpenMail, compact = false }: MailPanelProp
         </div>
       </div>
 
-      {mails.length === 0 ? (
+      {/* Search and filters - only show on full view */}
+      {showFilters && (
+        <div className="mail-controls">
+          <div className="mail-search">
+            <input
+              type="text"
+              placeholder="Sök i ämne, avsändare..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mail-search-input"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="mail-search-clear"
+                onClick={() => setSearchQuery('')}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="mail-filter-group">
+            <button
+              type="button"
+              className={`mail-filter-btn ${filter === 'alla' ? 'active' : ''}`}
+              onClick={() => setFilter('alla')}
+            >
+              Alla
+            </button>
+            <button
+              type="button"
+              className={`mail-filter-btn ${filter === 'olästa' ? 'active' : ''}`}
+              onClick={() => setFilter('olästa')}
+            >
+              Olästa
+            </button>
+            <button
+              type="button"
+              className={`mail-filter-btn ${filter === 'lästa' ? 'active' : ''}`}
+              onClick={() => setFilter('lästa')}
+            >
+              Lästa
+            </button>
+          </div>
+        </div>
+      )}
+
+      {filteredMails.length === 0 ? (
         <div className="mail-empty">
-          <p>🎉 Ingen oläst mail just nu!</p>
+          {searchQuery || filter !== 'olästa' ? (
+            <p>Inga mail matchar din sökning eller filter.</p>
+          ) : (
+            <p>🎉 Ingen oläst mail just nu!</p>
+          )}
         </div>
       ) : (
         <ul className="mail-list">
-          {mails.map((mail) => (
+          {filteredMails.map((mail) => (
             <li
               key={mail.id}
               className={`mail-item ${mail.isUnread ? 'unread' : ''}`}

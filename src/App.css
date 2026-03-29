@@ -1297,6 +1297,90 @@ h3 {
   overflow-y: auto;
 }
 
+/* Mail controls - search and filters */
+.mail-controls {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mail-search {
+  position: relative;
+}
+
+.mail-search-input {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(98, 64, 53, 0.15);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  color: #241916;
+  outline: none;
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.mail-search-input:focus {
+  border-color: #c99a9f;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 3px rgba(201, 154, 159, 0.2);
+}
+
+.mail-search-input::placeholder {
+  color: #8a7770;
+}
+
+.mail-search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(244, 228, 221, 0.7);
+  color: #5b3a31;
+  border: none;
+  font-size: 0.9rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.mail-search-clear:hover {
+  background: rgba(244, 228, 221, 1);
+}
+
+.mail-filter-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mail-filter-btn {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(98, 64, 53, 0.1);
+  color: #6b554e;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.mail-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.mail-filter-btn.active {
+  background: #c99a9f;
+  color: #fff;
+  border-color: #c99a9f;
+}
+
 /* Mail modal/panel */
 .mail-detail-panel {
   position: fixed;

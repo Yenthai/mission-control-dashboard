@@ -510,7 +510,7 @@ function App() {
 
   const renderMailView = () => (
     <section className="single-column-layout">
-      <MailPanel />
+      <MailPanel showFilters />
     </section>
   )
 
