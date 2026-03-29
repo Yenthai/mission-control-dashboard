@@ -311,74 +311,7 @@ function App() {
         </article>
       </section>
 
-      <section className="overview-grid premium-overview-grid">
-        <div className="overview-main-column">
-          <TodoPanel
-            progressPercent={progressPercent}
-            focusMessage={focusMessage}
-            completedTodos={completedTodos}
-            totalTodos={todos.length}
-            todoInput={todoInput}
-            setTodoInput={setTodoInput}
-            todoStatus={todoStatus}
-            setTodoStatus={setTodoStatus}
-            todoFilter={todoFilter}
-            setTodoFilter={setTodoFilter}
-            visibleTodos={visibleTodos}
-            handleAddTodo={handleAddTodo}
-            toggleTodoStatus={toggleTodoStatus}
-            editingTodoId={editingTodoId}
-            setEditingTodoId={setEditingTodoId}
-            updateTodoItem={updateTodoItem}
-          />
 
-          <NotesPanel
-            notes={notes}
-            noteInput={noteInput}
-            setNoteInput={setNoteInput}
-            handleAddNote={handleAddNote}
-            removeNote={removeNote}
-          />
-        </div>
-
-        <aside className="overview-side-column">
-          <article className="card shell-panel spotlight-card">
-            <p className="eyebrow">Belöning</p>
-            <h2>Fortsätt i samma rytm</h2>
-            <p className="lede">När du börjar i rätt ordning blir resten enklare. Börja med den viktigaste uppgiften och låt dashboarden hålla ihop resten.</p>
-          </article>
-
-          <AgendaPanel
-            agendaTime={agendaTime}
-            setAgendaTime={setAgendaTime}
-            agendaTitle={agendaTitle}
-            setAgendaTitle={setAgendaTitle}
-            agendaDetail={agendaDetail}
-            setAgendaDetail={setAgendaDetail}
-            handleAddAgenda={handleAddAgenda}
-            sortedAgenda={sortedAgenda}
-            editingAgendaId={editingAgendaId}
-            setEditingAgendaId={setEditingAgendaId}
-            updateAgendaItem={updateAgendaItem}
-            removeAgenda={removeAgenda}
-          />
-
-          <MeetingsPanel />
-
-          <article className="card support-card calendar-panel shell-panel toned-calendar-panel">
-            <div className="section-head">
-              <div>
-                <p className="eyebrow">Stöd</p>
-                <h2>Kalender</h2>
-              </div>
-            </div>
-
-            <div className="calendar-wrap">
-              <iframe src={googleCalendarEmbedUrl} title="Google Kalender" className="calendar-embed" frameBorder="0" scrolling="no" />
-            </div>
-          </article>
-        </aside>
-      </section>
     </>
   )
 
