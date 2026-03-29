@@ -54,6 +54,7 @@ button {
   padding: 24px;
   max-width: 1640px;
   margin: 0 auto;
+  position: relative;
 }
 
 .premium-sidebar {
@@ -510,7 +511,8 @@ h3 {
 .weather-location-picker select,
 .compact-form input,
 .compact-form select,
-.edit-input {
+.edit-input,
+.chat-composer textarea {
   padding: 11px 14px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.92);
@@ -518,30 +520,287 @@ h3 {
   color: #2b1d1a;
 }
 
-.live-weather {
+.weather-highlight-chip {
+  max-width: 220px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: rgba(232, 197, 208, 0.42);
+  color: #8d5f70;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.weather-metric-row {
+  display: grid;
+  gap: 12px;
+}
+
+.weather-metric-row.upper {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 14px;
+}
+
+.weather-metric-row.lower {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.weather-metric-row div {
+  padding: 14px 14px 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.weather-metric-row span {
+  display: block;
+  font-size: 0.78rem;
+  color: #8a6c64;
+  margin-bottom: 6px;
+}
+
+.weather-metric-row strong {
+  color: #2c1c19;
+  font-size: 1rem;
+}
+
+.weather-card-bottom-bar {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #6a473c 0%, #c891a0 100%);
+  color: #fff7f5;
+  font-weight: 700;
+  text-align: center;
+}
+
+.chat-trigger {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  width: 94px;
+  height: 94px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  background: transparent;
+  z-index: 50;
+  cursor: pointer;
+}
+
+.chat-trigger-background {
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6b463b 0%, #d29aa8 100%);
+  box-shadow: 0 16px 34px rgba(107, 70, 59, 0.28);
+}
+
+.chat-trigger-bubble {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  color: #fffaf8;
+}
+
+.chat-trigger .bubble {
+  transform-origin: 50%;
+  transition: transform 500ms cubic-bezier(0.17, 0.61, 0.54, 0.9);
+}
+
+.chat-trigger .line {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.75;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-trigger .line1 {
+  stroke-dasharray: 60 90;
+  stroke-dashoffset: -20;
+}
+
+.chat-trigger .line2 {
+  stroke-dasharray: 67 87;
+  stroke-dashoffset: -18;
+}
+
+.chat-trigger .circle {
+  fill: #ffffff;
+  stroke: none;
+  transform-origin: 50%;
+  transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-trigger.active .bubble {
+  transform: translateX(24px) translateY(4px) rotate(45deg);
+}
+
+.chat-trigger.active .line1 {
+  stroke-dashoffset: 21;
+}
+
+.chat-trigger.active .line2 {
+  stroke-dashoffset: 30;
+}
+
+.chat-trigger.active .circle {
+  transform: scale(0);
+}
+
+.chat-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 26, 22, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+  z-index: 40;
+}
+
+.chat-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.chat-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+  width: min(420px, calc(100vw - 32px));
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-radius: 30px;
+  background: linear-gradient(180deg, rgba(255, 251, 248, 0.98) 0%, rgba(247, 237, 230, 0.97) 100%);
+  border: 1px solid rgba(98, 64, 53, 0.08);
+  box-shadow: 0 28px 56px rgba(74, 47, 39, 0.2);
+  backdrop-filter: blur(18px);
+  transform: translateX(calc(100% + 40px));
+  transition: transform 220ms ease;
+  z-index: 45;
+}
+
+.chat-panel.open {
+  transform: translateX(0);
+}
+
+.chat-panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.chat-close-button {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #f2dfd8;
+  color: #6e4b41;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chat-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
-  padding: 16px 18px;
+}
+
+.chat-empty-state {
+  padding: 18px;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.64);
+  border: 1px solid rgba(98, 64, 53, 0.08);
 }
 
-.live-weather strong {
-  display: block;
-  font-size: 1.9rem;
-  line-height: 1;
-  color: #241816;
-  font-family: 'Fraunces', Georgia, serif;
+.chat-empty-state p:last-child {
+  margin: 10px 0 0;
+  color: #6f5b54;
+  line-height: 1.7;
 }
 
-.live-weather p {
-  margin: 6px 0 0;
-  color: #6d5852;
+.chat-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.live-weather-icon {
-  font-size: 2rem;
+.chat-message {
+  max-width: 88%;
+  padding: 14px 16px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  line-height: 1.65;
+}
+
+.chat-message p {
+  margin: 0;
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #6c473c 0%, #9f7062 100%);
+  color: #fff8f5;
+}
+
+.chat-message.assistant {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(98, 64, 53, 0.08);
+  color: #2d1e1a;
+}
+
+.chat-message.loading {
+  opacity: 0.8;
+}
+
+.chat-message-role {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.chat-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-composer textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+}
+
+.chat-composer button {
+  align-self: flex-end;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ba8292 0%, #e9aab9 100%);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chat-composer button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.chat-error-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #f8e5e8;
+  color: #8c4f5b;
 }
 
 .premium-stats-grid {
@@ -959,6 +1218,13 @@ h3 {
     padding: 24px;
     flex-direction: column;
   }
+
+  .chat-panel {
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+  }
 }
 
 @media (max-width: 680px) {
@@ -996,5 +1262,12 @@ h3 {
 
   .weather-cardm.is-expanded .weather-card-back {
     inset: auto;
+  }
+
+  .chat-trigger {
+    right: 18px;
+    bottom: 18px;
+    width: 84px;
+    height: 84px;
   }
 }

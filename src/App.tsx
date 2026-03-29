@@ -6,6 +6,8 @@ import MeetingsPanel from './components/MeetingsPanel'
 import TodoPanel from './components/TodoPanel'
 import AgendaPanel from './components/AgendaPanel'
 import LiveWidget from './components/LiveWidget'
+import ChatTrigger from './components/ChatTrigger'
+import ChatPanel from './components/ChatPanel'
 
 type AgendaItem = {
   id: number
@@ -37,6 +39,12 @@ type MailItem = {
 type NoteItem = {
   id: number
   text: string
+}
+
+type ChatMessage = {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
 }
 
 type NavItem = {
@@ -151,6 +159,11 @@ function App() {
   const [agendaDetail, setAgendaDetail] = useState('')
 
   const [noteInput, setNoteInput] = useState('')
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [chatDraft, setChatDraft] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const [chatError, setChatError] = useState('')
 
   const [editingAgendaId, setEditingAgendaId] = useState<number | null>(null)
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null)
@@ -242,6 +255,46 @@ function App() {
   const handleSelectView = (view: ViewKey) => {
     setActiveView(view)
     setMobileSidebarOpen(false)
+  }
+
+  const handleChatSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const prompt = chatDraft.trim()
+    if (!prompt || chatLoading) return
+
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: prompt,
+    }
+
+    setChatMessages((current) => [...current, userMessage])
+    setChatDraft('')
+    setChatLoading(true)
+    setChatError('')
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: prompt }),
+      })
+
+      if (!response.ok) throw new Error('Kunde inte hämta svar från AI')
+
+      const data = await response.json()
+      const assistantMessage: ChatMessage = {
+        id: `assistant-${Date.now()}`,
+        role: 'assistant',
+        content: data.reply || 'Jag kunde inte formulera ett svar just nu.',
+      }
+
+      setChatMessages((current) => [...current, assistantMessage])
+    } catch {
+      setChatError('Något gick fel när jag försökte prata med AI. Försök igen.')
+    } finally {
+      setChatLoading(false)
+    }
   }
 
   const renderOverview = () => (
@@ -589,6 +642,19 @@ function App() {
 
         <div className="view-shell">{renderActiveView()}</div>
       </section>
+
+      <ChatTrigger isOpen={isChatOpen} onToggle={() => setIsChatOpen((current) => !current)} />
+      <div className={`chat-overlay ${isChatOpen ? 'visible' : ''}`} onClick={() => setIsChatOpen(false)} />
+      <ChatPanel
+        isOpen={isChatOpen}
+        messages={chatMessages}
+        draft={chatDraft}
+        isLoading={chatLoading}
+        error={chatError}
+        onClose={() => setIsChatOpen(false)}
+        onDraftChange={setChatDraft}
+        onSubmit={handleChatSubmit}
+      />
     </main>
   )
 }
