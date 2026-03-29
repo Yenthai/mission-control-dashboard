@@ -14,21 +14,21 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/api/health', (_req, res) => {
-res.json({
-ok: true,
-message: 'Backend fungerar',
-})
+  res.json({
+    ok: true,
+    message: 'Backend fungerar',
+  })
 })
 
 app.get('/api/meetings', (_req, res) => {
-res.json([
-{ id: '1', time: '09:00', title: 'Morgonplanering', link: 'https://meet.google.com/' },
-{ id: '2', time: '11:30', title: 'Avstämning med Filip', link: 'https://meet.google.com/' },
-{ id: '3', time: '15:00', title: 'Kundmöte', link: 'https://meet.google.com/' },
-])
+  res.json([
+    { id: '1', time: '09:00', title: 'Morgonplanering', link: 'https://meet.google.com/' },
+    { id: '2', time: '11:30', title: 'Avstämning med Filip', link: 'https://meet.google.com/' },
+    { id: '3', time: '15:00', title: 'Kundmöte', link: 'https://meet.google.com/' },
+  ])
 })
 
-// Gmail API endpoint
+// Gmail API endpoint - hämtar olästa mail via gws CLI
 app.get('/api/mail', async (req, res) => {
   try {
     const { action, id } = req.query
@@ -171,5 +171,6 @@ app.get('/api/mail', async (req, res) => {
 })
 
 app.listen(PORT, () => {
-console.log(`Backend kör på http://localhost:${PORT}`)
+  console.log(`Backend kör på http://localhost:${PORT}`)
+  console.log(`Mail API: http://localhost:${PORT}/api/mail?action=unread`)
 })

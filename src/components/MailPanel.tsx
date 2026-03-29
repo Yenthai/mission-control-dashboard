@@ -32,7 +32,17 @@ export default function MailPanel({ onOpenMail, compact = false, showFilters = f
       setLoading(true)
       setError('')
 
-      const response = await fetch('/api/mail?action=unread')
+      // Försök först med API (lokal server)
+      let response: Response
+      try {
+        response = await fetch('/api/mail?action=unread', { 
+          signal: AbortSignal.timeout(5000) 
+        })
+      } catch (fetchError) {
+        // Fallback: fetcha direkt från Vercel API om lokal server inte finns
+        response = await fetch('https://mission-control-dashboard-ten.vercel.app/api/mail?action=unread')
+      }
+
       const data = await response.json()
 
       if (data.success) {
@@ -42,7 +52,7 @@ export default function MailPanel({ onOpenMail, compact = false, showFilters = f
         setError(data.error || 'Kunde inte hämta mail')
       }
     } catch (err) {
-      setError('Något gick fel vid hämtning av mail')
+      setError('Något gick fel vid hämtning av mail. Säkerställ att backend-servern körs.')
       console.error('Mail fetch error:', err)
     } finally {
       setLoading(false)
@@ -135,6 +145,9 @@ export default function MailPanel({ onOpenMail, compact = false, showFilters = f
         </div>
         <div className="mail-error">
           <p>{error}</p>
+          <p style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.8 }}>
+            Tips: Starta backend-servern med <code style={{ background: 'rgba(0,0,0,0.1)', padding: '2px 6px', borderRadius: '4px' }}>node server/index.js</code>
+          </p>
         </div>
       </article>
     )
