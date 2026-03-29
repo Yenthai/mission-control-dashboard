@@ -5,6 +5,7 @@ import NotesPanel from './components/NotesPanel'
 import MeetingsPanel from './components/MeetingsPanel'
 import TodoPanel from './components/TodoPanel'
 import AgendaPanel from './components/AgendaPanel'
+import LiveWidget from './components/LiveWidget'
 import ChatTrigger from './components/ChatTrigger'
 import ChatPanel from './components/ChatPanel'
 
@@ -298,7 +299,24 @@ function App() {
 
   const renderOverview = () => (
     <>
-      <section className="overview-stats-grid premium-stats-grid top-lifted-grid">
+      <section className="hero-card hero-lux card">
+        <div className="hero-copy hero-copy-simple">
+          <h1>Välkommen tillbaka Yen</h1>
+        </div>
+
+        <div className="hero-side">
+          <div className="hero-side-stack">
+            <LiveWidget />
+            <article className="hero-focus-card">
+              <p className="eyebrow">Fokus idag</p>
+              <h2>{progressPercent}% på väg framåt</h2>
+              <p>{completedTodos} av {todos.length} tasks klara. {latestNote}</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="overview-stats-grid premium-stats-grid">
         <article className="stat-card accent-peach soft-card stat-card-featured">
           <span>Öppna tasks</span>
           <strong>{activeTodos}</strong>
