@@ -330,6 +330,22 @@ h3 {
   max-width: 12ch;
 }
 
+.hero-copy .compact-mail-panel {
+  margin-top: 8px;
+}
+
+.hero-copy .compact-mail-panel .section-head {
+  margin-bottom: 8px;
+}
+
+.hero-copy .compact-mail-panel h2 {
+  font-size: 1rem;
+}
+
+.hero-copy .compact-mail-panel .mail-list {
+  max-height: 240px;
+}
+
 .hero-lede {
   max-width: 58ch;
 }

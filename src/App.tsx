@@ -268,8 +268,9 @@ function App() {
   const renderOverview = () => (
     <>
       <section className="hero-card hero-lux card">
-        <div className="hero-copy hero-copy-simple">
+        <div className="hero-copy">
           <h1>Välkommen tillbaka Yen</h1>
+          <MailPanel compact />
         </div>
 
         <div className="hero-side">
@@ -283,8 +284,6 @@ function App() {
           </div>
         </div>
       </section>
-
-      <MailPanel compact />
 
       <section className="overview-stats-grid premium-stats-grid">
         <article className="stat-card accent-peach soft-card stat-card-featured">
