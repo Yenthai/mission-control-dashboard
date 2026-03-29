@@ -8,6 +8,7 @@ import AgendaPanel from './components/AgendaPanel'
 import LiveWidget from './components/LiveWidget'
 import ChatTrigger from './components/ChatTrigger'
 import ChatPanel from './components/ChatPanel'
+import MailPanel from './components/MailPanel'
 
 type AgendaItem = {
   id: number
@@ -18,7 +19,7 @@ type AgendaItem = {
 
 type TodoStatus = 'PRIO' | 'Pågår' | 'Klar'
 type TodoFilter = 'Alla' | 'Aktiva' | 'Klara'
-type ViewKey = 'overview' | 'notes' | 'meetings' | 'todo' | 'focus' | 'settings'
+type ViewKey = 'overview' | 'notes' | 'meetings' | 'todo' | 'focus' | 'settings' | 'mail'
 
 type TodoItem = {
   id: number
@@ -66,6 +67,7 @@ const googleCalendarEmbedUrl =
 
 const navItems: NavItem[] = [
   { key: 'overview', label: 'Översikt', icon: '◌', eyebrow: 'Hem' },
+  { key: 'mail', label: 'Mail', icon: '✉', eyebrow: 'Inkorg' },
   { key: 'notes', label: 'Notes', icon: '✦', eyebrow: 'Skrivyta' },
   { key: 'meetings', label: 'Meetings', icon: '◈', eyebrow: 'Kalender' },
   { key: 'todo', label: 'Todo', icon: '✓', eyebrow: 'Fokus' },
@@ -281,6 +283,8 @@ function App() {
           </div>
         </div>
       </section>
+
+      <MailPanel compact />
 
       <section className="overview-stats-grid premium-stats-grid">
         <article className="stat-card accent-peach soft-card stat-card-featured">
@@ -504,6 +508,12 @@ function App() {
     </section>
   )
 
+  const renderMailView = () => (
+    <section className="single-column-layout">
+      <MailPanel />
+    </section>
+  )
+
   const renderActiveView = () => {
     switch (activeView) {
       case 'notes':
@@ -514,6 +524,8 @@ function App() {
         return renderTodoView()
       case 'focus':
         return renderFocusView()
+      case 'mail':
+        return renderMailView()
       case 'settings':
         return renderSettingsView()
       case 'overview':
