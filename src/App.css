@@ -586,6 +586,11 @@ h3 {
   cursor: pointer;
 }
 
+.chat-panel.open ~ .chat-trigger,
+.chat-trigger.active {
+  right: min(448px, calc(100vw - 124px));
+}
+
 .chat-trigger-background {
   position: absolute;
   inset: 12px;
@@ -1224,6 +1229,12 @@ h3 {
     right: 12px;
     bottom: 12px;
     width: calc(100vw - 24px);
+  }
+
+  .chat-panel.open ~ .chat-trigger,
+  .chat-trigger.active {
+    right: 18px;
+    bottom: calc(100vh - 108px);
   }
 }
 
