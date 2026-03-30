@@ -622,12 +622,6 @@ function App() {
             </button>
           ))}
         </nav>
-
-        <div className="sidebar-footer card premium-sidebar-footer">
-          <p className="eyebrow">Status</p>
-          <h3>Du har kontroll på läget</h3>
-          <p>{activeTodos} aktiva tasks · {notes.length} notes · {sortedAgenda.length} agenda-punkter</p>
-        </div>
       </aside>
 
       <section className="main-shell main-shell-lifted">
