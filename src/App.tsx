@@ -329,6 +329,18 @@ function App() {
 
   const renderNotesView = () => (
     <section className="single-column-layout">
+      <div className="mobile-header-bar">
+        <button
+          type="button"
+          className="mobile-menu-button"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Öppna meny"
+        >
+          ☰
+        </button>
+        <h1>Notes</h1>
+        <div className="mobile-spacer" />
+      </div>
       <NotesPanel
         notes={notes}
         noteInput={noteInput}
@@ -341,6 +353,18 @@ function App() {
 
   const renderMeetingsView = () => (
     <section className="dual-column-layout">
+      <div className="mobile-header-bar">
+        <button
+          type="button"
+          className="mobile-menu-button"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Öppna meny"
+        >
+          ☰
+        </button>
+        <h1>Meetings</h1>
+        <div className="mobile-spacer" />
+      </div>
       <MeetingsPanel />
       <article className="card support-card calendar-panel shell-panel toned-calendar-panel">
         <div className="section-head">
@@ -359,6 +383,18 @@ function App() {
 
   const renderTodoView = () => (
     <section className="single-column-layout">
+      <div className="mobile-header-bar">
+        <button
+          type="button"
+          className="mobile-menu-button"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Öppna meny"
+        >
+          ☰
+        </button>
+        <h1>Todo</h1>
+        <div className="mobile-spacer" />
+      </div>
       <TodoPanel
         progressPercent={progressPercent}
         focusMessage={focusMessage}
@@ -382,6 +418,18 @@ function App() {
 
   const renderFocusView = () => (
     <section className="focus-layout">
+      <div className="mobile-header-bar">
+        <button
+          type="button"
+          className="mobile-menu-button"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Öppna meny"
+        >
+          ☰
+        </button>
+        <h1>Fokus idag</h1>
+        <div className="mobile-spacer" />
+      </div>
       <article className="card focus-hero-card shell-panel">
         <p className="eyebrow">Fokus idag</p>
         <h2>{focusMessage}</h2>
@@ -442,6 +490,18 @@ function App() {
 
   const renderSettingsView = () => (
     <section className="single-column-layout">
+      <div className="mobile-header-bar">
+        <button
+          type="button"
+          className="mobile-menu-button"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Öppna meny"
+        >
+          ☰
+        </button>
+        <h1>Inställningar</h1>
+        <div className="mobile-spacer" />
+      </div>
       <article className="card shell-panel settings-placeholder">
         <p className="eyebrow">Inställningar</p>
         <h2>Här kan vi bygga nästa steg senare</h2>
@@ -454,6 +514,18 @@ function App() {
 
   const renderMailView = () => (
     <section className="single-column-layout">
+      <div className="mobile-header-bar">
+        <button
+          type="button"
+          className="mobile-menu-button"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Öppna meny"
+        >
+          ☰
+        </button>
+        <h1>Mail</h1>
+        <div className="mobile-spacer" />
+      </div>
       <MailPanel showFilters />
     </section>
   )
