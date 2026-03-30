@@ -600,12 +600,6 @@ function App() {
           </div>
         </div>
 
-        <article className="sidebar-intro-panel">
-          <span className="sidebar-intro-label">Premium workflow</span>
-          <strong>Lugn struktur med varm känsla</strong>
-          <p>Fokus först, resten efteråt.</p>
-        </article>
-
         <nav className="sidebar-nav">
           {navItems.map((item) => (
             <button
