@@ -163,11 +163,11 @@ h3 {
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   text-align: left;
-  padding: 14px 16px;
-  border-radius: 24px;
+  padding: 10px 14px;
+  border-radius: 20px;
   background: transparent;
   color: rgba(255, 246, 242, 0.88);
   cursor: pointer;
@@ -186,13 +186,13 @@ h3 {
 }
 
 .sidebar-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 15px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
   background: rgba(255, 252, 251, 0.1);
-  font-size: 1rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
 }
 
@@ -207,14 +207,14 @@ h3 {
 }
 
 .sidebar-copy small {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   opacity: 0.66;
 }
 
 .sidebar-copy strong {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .premium-sidebar-footer {
