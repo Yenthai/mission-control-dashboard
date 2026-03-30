@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { motion } from 'motion/react'
 import './App.css'
 import NotesPanel from './components/NotesPanel'
 import MeetingsPanel from './components/MeetingsPanel'
@@ -267,20 +268,32 @@ function App() {
 
   const renderOverview = () => (
     <>
-      <div className="mobile-header-bar">
-        <button
+      <motion.div
+        className="mobile-header-bar"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.button
           type="button"
           className="mobile-menu-button"
           onClick={() => setMobileSidebarOpen(true)}
           aria-label="Öppna meny"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           ☰
-        </button>
+        </motion.button>
         <h1>Välkommen tillbaka Yen</h1>
         <div className="mobile-spacer" />
-      </div>
+      </motion.div>
 
-      <section className="hero-card hero-lux card">
+      <motion.section
+        className="hero-card hero-lux card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         <div className="hero-copy">
           <MailPanel compact />
         </div>
@@ -288,40 +301,65 @@ function App() {
         <div className="hero-side">
           <div className="hero-side-stack">
             <LiveWidget />
-            <article className="hero-focus-card">
+            <motion.article
+              className="hero-focus-card"
+              whileHover={{ y: -2, scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+            >
               <p className="eyebrow">Fokus idag</p>
               <h2>{progressPercent}% på väg framåt</h2>
               <p>{completedTodos} av {todos.length} tasks klara. {latestNote}</p>
-            </article>
+            </motion.article>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="overview-stats-grid premium-stats-grid">
-        <article className="stat-card accent-peach soft-card stat-card-featured">
+      <motion.section
+        className="overview-stats-grid premium-stats-grid"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
+        <motion.article
+          className="stat-card accent-peach soft-card stat-card-featured"
+          whileHover={{ y: -4, scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
           <span>Öppna tasks</span>
           <strong>{activeTodos}</strong>
           <p>{importantTodos} markerade som viktiga just nu</p>
-        </article>
+        </motion.article>
 
-        <article className="stat-card accent-sand soft-card">
+        <motion.article
+          className="stat-card accent-sand soft-card"
+          whileHover={{ y: -4, scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
           <span>Nästa punkt</span>
           <strong>{nextAgenda ? nextAgenda.time : '--:--'}</strong>
           <p>{nextAgenda ? nextAgenda.title : 'Ingen agenda ännu'}</p>
-        </article>
+        </motion.article>
 
-        <article className="stat-card accent-lilac soft-card">
+        <motion.article
+          className="stat-card accent-lilac soft-card"
+          whileHover={{ y: -4, scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
           <span>Senaste note</span>
           <strong>{notes.length}</strong>
           <p>{latestNote}</p>
-        </article>
+        </motion.article>
 
-        <article className="stat-card accent-cream soft-card">
+        <motion.article
+          className="stat-card accent-cream soft-card"
+          whileHover={{ y: -4, scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
           <span>Fokus idag</span>
           <strong>{progressPercent}%</strong>
           <p>{focusMessage}</p>
-        </article>
-      </section>
+        </motion.article>
+      </motion.section>
 
 
     </>
@@ -554,7 +592,12 @@ function App() {
     <main className="app-shell premium-shell">
       <div className={`mobile-backdrop ${mobileSidebarOpen ? 'is-visible' : ''}`} onClick={() => setMobileSidebarOpen(false)} />
 
-      <aside className={`sidebar-shell premium-sidebar ${mobileSidebarOpen ? 'is-open' : ''}`}>
+      <motion.aside
+        className={`sidebar-shell premium-sidebar ${mobileSidebarOpen ? 'is-open' : ''}`}
+        initial={{ x: '-100%' }}
+        animate={{ x: mobileSidebarOpen ? 0 : '-100%' }}
+        transition={{ duration: 0.25, ease: 'easeInOut' }}
+      >
         <div className="sidebar-brand">
           <div className="brand-mark">Y</div>
           <div>
@@ -563,35 +606,50 @@ function App() {
           </div>
         </div>
 
-        <article className="sidebar-intro-panel">
+        <motion.article
+          className="sidebar-intro-panel"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+        >
           <span className="sidebar-intro-label">Premium workflow</span>
           <strong>Lugn struktur med varm känsla</strong>
           <p>Fokus först, resten efteråt.</p>
-        </article>
+        </motion.article>
 
         <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <button
+          {navItems.map((item, index) => (
+            <motion.button
               key={item.key}
               type="button"
               className={`sidebar-link ${activeView === item.key ? 'active' : ''}`}
               onClick={() => handleSelectView(item.key)}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.05 * index, duration: 0.2 }}
+              whileHover={{ x: 4 }}
+              whileTap={{ scale: 0.98 }}
             >
               <span className="sidebar-icon" aria-hidden="true">{item.icon}</span>
               <span className="sidebar-copy">
                 <small>{item.eyebrow}</small>
                 <strong>{item.label}</strong>
               </span>
-            </button>
+            </motion.button>
           ))}
         </nav>
 
-        <div className="sidebar-footer card premium-sidebar-footer">
+        <motion.div
+          className="sidebar-footer card premium-sidebar-footer"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+        >
           <p className="eyebrow">Status</p>
           <h3>Du har kontroll på läget</h3>
           <p>{activeTodos} aktiva tasks · {notes.length} notes · {sortedAgenda.length} agenda-punkter</p>
-        </div>
-      </aside>
+        </motion.div>
+      </motion.aside>
 
       <section className="main-shell main-shell-lifted">
         <div className="view-shell">{renderActiveView()}</div>
