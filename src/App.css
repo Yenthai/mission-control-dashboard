@@ -1068,6 +1068,19 @@ h3 {
   background: transparent;
   cursor: pointer;
   flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: #44735a;
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.check-toggle:hover {
+  border-color: #44735a;
+  background: rgba(68, 115, 90, 0.1);
+}
+
+.check-toggle:active {
+  background: rgba(68, 115, 90, 0.2);
 }
 
 .badge {

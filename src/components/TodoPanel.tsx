@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'motion/react'
 
 type TodoStatus = 'PRIO' | 'Pågår' | 'Klar'
 type TodoFilter = 'Alla' | 'Aktiva' | 'Klara'
@@ -110,8 +111,40 @@ export default function TodoPanel({
 
       <div className="todo-list large-list">
         {visibleTodos.map((item) => (
-          <div key={item.id} className={`mini-card todo-card ${item.important ? 'important-row' : ''} ${item.status === 'Klar' ? 'completed-todo' : ''}`}>
-            <button className="check-toggle" type="button" aria-label="Byt status" onClick={() => toggleTodoStatus(item.id)} />
+          <motion.div
+            key={item.id}
+            className={`mini-card todo-card ${item.important ? 'important-row' : ''} ${item.status === 'Klar' ? 'completed-todo' : ''}`}
+            whileHover={{ y: -2, scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            transition={{ duration: 0.15 }}
+          >
+            <motion.button
+              className="check-toggle"
+              type="button"
+              aria-label="Byt status"
+              onClick={() => toggleTodoStatus(item.id)}
+              whileTap={{ scale: 0.9 }}
+              animate={item.status === 'Klar' ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            >
+              {item.status === 'Klar' && (
+                <motion.svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </motion.svg>
+              )}
+            </motion.button>
             <div className="grow">
               {editingTodoId === item.id ? (
                 <div className="edit-stack grow">
@@ -135,7 +168,7 @@ export default function TodoPanel({
                 </>
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </article>

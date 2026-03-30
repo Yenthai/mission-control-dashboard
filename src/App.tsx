@@ -10,6 +10,7 @@ import LiveWidget from './components/LiveWidget'
 import ChatTrigger from './components/ChatTrigger'
 import ChatPanel from './components/ChatPanel'
 import MailPanel from './components/MailPanel'
+import AnimatedNumber from './components/AnimatedNumber'
 
 type AgendaItem = {
   id: number
@@ -326,7 +327,7 @@ function App() {
           transition={{ duration: 0.2 }}
         >
           <span>Öppna tasks</span>
-          <strong>{activeTodos}</strong>
+          <strong><AnimatedNumber value={activeTodos} /></strong>
           <p>{importantTodos} markerade som viktiga just nu</p>
         </motion.article>
 
@@ -346,7 +347,7 @@ function App() {
           transition={{ duration: 0.2 }}
         >
           <span>Senaste note</span>
-          <strong>{notes.length}</strong>
+          <strong><AnimatedNumber value={notes.length} /></strong>
           <p>{latestNote}</p>
         </motion.article>
 
@@ -356,7 +357,7 @@ function App() {
           transition={{ duration: 0.2 }}
         >
           <span>Fokus idag</span>
-          <strong>{progressPercent}%</strong>
+          <strong><AnimatedNumber value={progressPercent} />%</strong>
           <p>{focusMessage}</p>
         </motion.article>
       </motion.section>

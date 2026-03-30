@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { motion } from 'motion/react'
 
 type MailItem = {
   id: string
@@ -231,10 +232,13 @@ export default function MailPanel({ onOpenMail, compact = false, showFilters = f
       ) : (
         <ul className="mail-list">
           {filteredMails.map((mail) => (
-            <li
+            <motion.li
               key={mail.id}
               className={`mail-item ${mail.isUnread ? 'unread' : ''}`}
               onClick={() => handleMailClick(mail)}
+              whileHover={{ y: -2, scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              transition={{ duration: 0.15 }}
             >
               <div className="mail-main">
                 <div className="mail-from">{formatFrom(mail.from)}</div>
@@ -247,7 +251,7 @@ export default function MailPanel({ onOpenMail, compact = false, showFilters = f
               {!compact && mail.snippet && (
                 <div className="mail-snippet">{mail.snippet}</div>
               )}
-            </li>
+            </motion.li>
           ))}
         </ul>
       )}
