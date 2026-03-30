@@ -267,9 +267,21 @@ function App() {
 
   const renderOverview = () => (
     <>
+      <div className="mobile-header-bar">
+        <button
+          type="button"
+          className="mobile-menu-button"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Öppna meny"
+        >
+          ☰
+        </button>
+        <h1>Välkommen tillbaka Yen</h1>
+        <div className="mobile-spacer" />
+      </div>
+
       <section className="hero-card hero-lux card">
         <div className="hero-copy">
-          <h1>Välkommen tillbaka Yen</h1>
           <MailPanel compact />
         </div>
 
