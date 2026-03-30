@@ -80,7 +80,7 @@ const navItems: NavItem[] = [
 const defaultAgenda: AgendaItem[] = [
   { id: 1, time: '09:00', title: 'Planera dagen', detail: 'Gå igenom mål, dagens viktigaste uppgifter och tidblock.' },
   { id: 2, time: '10:30', title: 'Kunduppföljning', detail: 'Svar på leads och prioritera nästa steg.' },
-  { id: 3, time: '13:00', title: 'Admin + mail', detail: 'Rensa inkorg och svara på viktiga trådar.' },
+  { id: 3, time: '13:00', title: 'Admin + mail', detail: 'Rensa inkorg och svara på viktiga svar.' },
   { id: 4, time: '15:00', title: 'Projektfokus', detail: 'Arbeta ostört med pågående dashboard och struktur.' },
 ]
 
@@ -361,8 +361,6 @@ function App() {
           <p>{focusMessage}</p>
         </motion.article>
       </motion.section>
-
-
     </>
   )
 
@@ -593,12 +591,7 @@ function App() {
     <main className="app-shell premium-shell">
       <div className={`mobile-backdrop ${mobileSidebarOpen ? 'is-visible' : ''}`} onClick={() => setMobileSidebarOpen(false)} />
 
-      <motion.aside
-        className={`sidebar-shell premium-sidebar ${mobileSidebarOpen ? 'is-open' : ''}`}
-        initial={false}
-        animate={{ x: mobileSidebarOpen ? 0 : '-100%' }}
-        transition={{ duration: 0.25, ease: 'easeInOut' }}
-      >
+      <aside className={`sidebar-shell premium-sidebar ${mobileSidebarOpen ? 'is-open' : ''}`}>
         <div className="sidebar-brand">
           <div className="brand-mark">Y</div>
           <div>
@@ -607,50 +600,35 @@ function App() {
           </div>
         </div>
 
-        <motion.article
-          className="sidebar-intro-panel"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
-        >
+        <article className="sidebar-intro-panel">
           <span className="sidebar-intro-label">Premium workflow</span>
           <strong>Lugn struktur med varm känsla</strong>
           <p>Fokus först, resten efteråt.</p>
-        </motion.article>
+        </article>
 
         <nav className="sidebar-nav">
-          {navItems.map((item, index) => (
-            <motion.button
+          {navItems.map((item) => (
+            <button
               key={item.key}
               type="button"
               className={`sidebar-link ${activeView === item.key ? 'active' : ''}`}
               onClick={() => handleSelectView(item.key)}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.05 * index, duration: 0.2 }}
-              whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.98 }}
             >
               <span className="sidebar-icon" aria-hidden="true">{item.icon}</span>
               <span className="sidebar-copy">
                 <small>{item.eyebrow}</small>
                 <strong>{item.label}</strong>
               </span>
-            </motion.button>
+            </button>
           ))}
         </nav>
 
-        <motion.div
-          className="sidebar-footer card premium-sidebar-footer"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-        >
+        <div className="sidebar-footer card premium-sidebar-footer">
           <p className="eyebrow">Status</p>
           <h3>Du har kontroll på läget</h3>
           <p>{activeTodos} aktiva tasks · {notes.length} notes · {sortedAgenda.length} agenda-punkter</p>
-        </motion.div>
-      </motion.aside>
+        </div>
+      </aside>
 
       <section className="main-shell main-shell-lifted">
         <div className="view-shell">{renderActiveView()}</div>
