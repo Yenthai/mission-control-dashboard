@@ -595,7 +595,7 @@ function App() {
 
       <motion.aside
         className={`sidebar-shell premium-sidebar ${mobileSidebarOpen ? 'is-open' : ''}`}
-        initial={{ x: '-100%' }}
+        initial={false}
         animate={{ x: mobileSidebarOpen ? 0 : '-100%' }}
         transition={{ duration: 0.25, ease: 'easeInOut' }}
       >
